@@ -16,5 +16,8 @@ module.exports = {
                 loader: 'ts-loader'
             }
         ]
+    },
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js']
     }
 }
