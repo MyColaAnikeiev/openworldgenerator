@@ -28,6 +28,17 @@ module.exports = {
                         }
                     }
                 ]
+            },
+            {
+                test: /.scss$/i,
+                use: [
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            implementation: require("sass")
+                        }
+                    }
+                ]
             }
         ]
     },
