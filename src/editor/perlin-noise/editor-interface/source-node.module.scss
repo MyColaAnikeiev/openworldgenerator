@@ -1,0 +1,51 @@
+$textColor: rgb(170, 170, 170);
+
+.source-node{
+    position: absolute;
+    width: 180px;
+    background-color: rgb(30, 27, 27);
+    border-radius: 6px 6px 0 0;
+    padding-bottom: 6px;
+    font-family: "Courier New", Courier, monospace;
+    color: $textColor;
+    border: 1px solid #3e3e3e;
+
+    .head{
+        height: 11px;
+        background-color: inherit;
+        border-radius: 6px 6px 0 0;
+    }
+
+    .body{
+        padding: 5px;
+    }
+
+    .preview{
+        padding: 10px;
+        background-color: rgb(43, 42, 42);
+
+        canvas{
+            width: 100%;
+        }
+    }
+
+    .properties{
+        margin-top: 10px;
+    }
+
+    .row{
+        display: grid;
+        grid-template-columns: 55px 1fr;
+
+        input{
+            width: 100%;
+            background-color: #242222;
+            border: 1px solid #3e3e3e;
+            color: rgb(170, 170, 170);
+            margin-right: 33px;
+            font-size: 1.1em;
+            padding: 1px 0 1px 5px;
+            box-sizing: border-box;
+        }
+    }
+}
