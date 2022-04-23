@@ -1,12 +1,20 @@
 import { Component, MouseEvent } from "react"
+import { debounceTime, Observable, Subject, takeUntil } from "rxjs";
 import { NodeSchema } from "../types"
 import styles from './source-node.module.scss';
 
 export class SourceNode extends Component{
+
+    bouncer: Subject<{}> = new Subject();
+    unsubscriber$: Subject<void> = new Subject();
+
+    canvasRef: HTMLCanvasElement;
     
     props: { 
         schema: NodeSchema,
-        contextMenuTrigger: (evt: MouseEvent) => void
+        contextMenuTrigger: (evt: MouseEvent) => void,
+        outputTrigger: (out: { [key: string]: any }) => void,
+        preview$: Observable<ImageData>;
     }
 
     state: {
@@ -23,6 +31,18 @@ export class SourceNode extends Component{
         this.state = {
             drag:  { on: false, lastX: 0, lastY: 0 }
         }
+
+        this.bouncer.pipe(
+            debounceTime(250),
+            takeUntil(this.unsubscriber$)
+        ).subscribe((changes) => {
+            this.props.outputTrigger(changes);
+        })
+
+        this.props.preview$.pipe(takeUntil(this.unsubscriber$))
+            .subscribe((img: ImageData) => {
+                this.canvasRef.getContext('2d').putImageData(img, 0,0);
+            })
     }
 
     render(){
@@ -47,7 +67,10 @@ export class SourceNode extends Component{
                 >
                     <div className={styles.head}></div>
                     <div className={styles.preview}>
-                            <canvas></canvas>
+                            <canvas 
+                                ref={ref => this.canvasRef = ref}
+                                width="180" height="120"
+                            ></canvas>
                     </div>
                 </div>
                 <div className={styles.body}>
@@ -55,16 +78,29 @@ export class SourceNode extends Component{
                     <div className={styles.properties}>
                         <div className={styles.row}>
                             <label>Seed</label>
-                            <input type="number" min="0" max="255"/>
+                            <input
+                                name="seed"
+                                type="number" min="0" max="255"
+                                onInput={this.handleInput.bind(this)}
+                            />
                         </div>
                         <div className={styles.row}>
                             <label>Size</label>
-                            <input type="number" min="0.0001" step="0.1" />
+                            <input 
+                                name="size"
+                                type="number" min="0.0001" step="0.1"
+                                onInput={this.handleInput.bind(this)}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
         )      
+    }
+
+    handleInput(evt: InputEvent){
+        const elm = evt.target as HTMLInputElement;
+        this.props.outputTrigger({ [elm.name] : elm.value });
     }
 
     contextMenu(evt: MouseEvent){
@@ -116,5 +152,10 @@ export class SourceNode extends Component{
             }
         })
     }
-    
+
+
+    componentWillUnmount(){
+        this.unsubscriber$.next();
+        this.unsubscriber$.complete();
+    }
 }
