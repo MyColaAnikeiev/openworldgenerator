@@ -1,5 +1,5 @@
 import { Component, MouseEvent } from "react"
-import { debounceTime, Observable, Subject, takeUntil } from "rxjs";
+import { debounceTime, delay, Observable, Subject, takeUntil } from "rxjs";
 import { NodeSchema } from "../types"
 import styles from './source-node.module.scss';
 
@@ -39,7 +39,10 @@ export class SourceNode extends Component{
             this.props.outputTrigger(changes);
         })
 
-        this.props.preview$.pipe(takeUntil(this.unsubscriber$))
+        this.props.preview$.pipe(
+            delay(0),
+            takeUntil(this.unsubscriber$)
+        )
             .subscribe((img: ImageData) => {
                 this.canvasRef.getContext('2d').putImageData(img, 0,0);
             })
