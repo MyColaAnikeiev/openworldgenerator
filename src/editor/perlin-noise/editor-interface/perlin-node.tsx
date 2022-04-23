@@ -1,11 +1,12 @@
 import { Component, MouseEvent } from "react"
-import { debounceTime, delay, Observable, Subject, takeUntil } from "rxjs";
-import { NodeSchema } from "../types"
-import styles from './source-node.module.scss';
+import { delay, Observable, Subject, takeUntil } from "rxjs";
+import { NodeSchema, SourceSchemaProperties } from "../types"
+import { CombinatorNodeProperties } from "./combinator-node-properties";
+import styles from './perlin-node.module.scss';
+import { SourceNodeProperties } from "./source-node-properties";
 
-export class SourceNode extends Component{
+export class PerlinNodeComponent extends Component{
 
-    bouncer: Subject<{}> = new Subject();
     unsubscriber$: Subject<void> = new Subject();
 
     canvasRef: HTMLCanvasElement;
@@ -32,13 +33,6 @@ export class SourceNode extends Component{
             drag:  { on: false, lastX: 0, lastY: 0 }
         }
 
-        this.bouncer.pipe(
-            debounceTime(250),
-            takeUntil(this.unsubscriber$)
-        ).subscribe((changes) => {
-            this.props.outputTrigger(changes);
-        })
-
         this.props.preview$.pipe(
             delay(0),
             takeUntil(this.unsubscriber$)
@@ -53,6 +47,7 @@ export class SourceNode extends Component{
             top: this.props.schema.position.top.toString() + 'px',
             left: this.props.schema.position.left.toString() + 'px'
         }
+        const properties = this.props.schema.properties as SourceSchemaProperties;
 
         return (
             <div 
@@ -76,29 +71,31 @@ export class SourceNode extends Component{
                             ></canvas>
                     </div>
                 </div>
+
                 <div className={styles.body}>
                     
-                    <div className={styles.properties}>
-                        <div className={styles.row}>
-                            <label>Seed</label>
-                            <input
-                                name="seed"
-                                type="number" min="0" max="255"
-                                onInput={this.handleInput.bind(this)}
-                            />
-                        </div>
-                        <div className={styles.row}>
-                            <label>Size</label>
-                            <input 
-                                name="size"
-                                type="number" min="0.0001" step="0.1"
-                                onInput={this.handleInput.bind(this)}
-                            />
-                        </div>
+                    {this.getPropertyControls()}
+
+                    <div className={styles.hook}>
+
                     </div>
                 </div>
             </div>
         )      
+    }
+
+    getPropertyControls(){
+        const {schema} = this.props;
+        const {outputTrigger: trigger} = this.props;
+
+        switch(schema.type){
+            case "source":
+                return <SourceNodeProperties schema={schema} outputTrigger={trigger}/>
+            case "combinator":
+            case "weighted-combinator":
+                return <CombinatorNodeProperties schema={schema} outputTrigger={trigger}/>
+        }
+
     }
 
     handleInput(evt: InputEvent){

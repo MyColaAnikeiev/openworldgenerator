@@ -6,7 +6,7 @@ export type SourceSchemaProperties = {
 };
 
 export type CombinatorSchemaProperties = {
-    weighted: boolean;
+    numOfInputs: number;
     weights?: number[];
 };
 
@@ -35,5 +35,7 @@ export interface NodeSchema{
 export type NodeConnection = {
     idTo: number,
     idFrom: number,
-    targetType: "default" | "scale-filter.control"
+    targetType: "default" | "scale-filter.control",
+    // 
+    targetEntryNumber?: number
 }

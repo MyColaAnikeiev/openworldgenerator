@@ -53,11 +53,32 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
                 size: 1,
                 seed: 0
             }
+        },
+        {
+            id: 3,
+            type: 'source',
+            position: { top: 300, left: 120 },
+            properties: {
+                size: 1,
+                seed: 0
+            }
+        },
+        {
+            id: 2,
+            type: 'weighted-combinator',
+            position: { top: 320, left: 420 },
+            properties: {
+                numOfInputs: 2,
+                weights: [1.0,1.0]
+            }
         }
     ];
 
     private nodes: Map<number, PerlinNode> = new Map();
-    private connections: NodeConnection[] = [];
+    private connections: NodeConnection[] = [
+        { targetType: "default", idFrom: 1, idTo: 2, targetEntryNumber: 0},
+        { targetType: "default", idFrom: 3, idTo: 2, targetEntryNumber: 1}
+    ];
 
     // 
     public updated$: Subject<number> = new Subject();
@@ -76,10 +97,10 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
                 props = { size: 1.0, seed: 0 }
                 break;
             case "combinator":
-                props = { weighted: false}
+                props = { numOfInputs: 2}
                 break;
             case "weighted-combinator":
-                props = { weighted: true , weights: [1.0, 1.0]};
+                props = { numOfInputs: 2, weights: [1.0, 1.0]};
                 break;
             case "filter":
                 props = { filterType: "scale",  scale: 1.0 }
@@ -97,17 +118,44 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
     }
 
     updateNode(id: number, changes: {}){
-        const node = this.nodeSchemas.find( node => node.id === id );
-        if(node){
-            node.properties = Object.assign(node.properties, changes);
+        const schema = this.nodeSchemas.find(schema => schema.id === id);
+        const node = this.getNodeInstance(schema.id)
+
+        if(schema.type === "source"){
+            if(schema){
+                schema.properties = Object.assign(schema.properties, changes);
+            }
+            node.updateProperties(changes);
         }
 
-        // Tmp
-        const instance = this.getNodeInstance(id) as PerlinNoise;
-        if(instance){
-            instance.updateProperties(changes);
-        }
+        if(schema.type === "combinator" || schema.type === "weighted-combinator"){
+            const prop = schema.properties as CombinatorSchemaProperties;
+            const numOfInputs = Number(changes["num-of-inputs"]);
+            if(numOfInputs < 2){
+                return;
+            }
 
+            if(schema.type === "combinator"){
+                if("num-of-inputs" in changes){
+                    prop.numOfInputs = numOfInputs;
+                    (node as PerlinCombine).updateSources(<PerlinNode[]>this.getCombinatorInputs(schema))
+                }
+            }
+
+            if(schema.type === "weighted-combinator"){
+                if("num-of-inputs" in changes){
+                    if(prop.numOfInputs < numOfInputs){
+                        for(let i = 0; i < numOfInputs - prop.numOfInputs; i++){
+                            prop.weights.push(1.0);
+                        }
+                    }
+                    prop.numOfInputs = numOfInputs;
+                    (node as PerlinCombineWeighted).updateSources(<NodeWeightPair[]>this.getCombinatorInputs(schema))
+                }
+            }
+
+        }
+        
         this.updated$.next(id);
     }
 
@@ -191,6 +239,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             case "source":
                 return this.instantiateSource(schema);
             case "combinator":
+            case "weighted-combinator":
                 return this.instantiateCombinator(schema);
             case "filter":
                 return this.instantiateFilter(schema);
@@ -205,6 +254,21 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
     }
 
     private instantiateCombinator(schema: NodeSchema): PerlinNode{
+        const inputs = this.getCombinatorInputs(schema);
+
+        let instance: PerlinNode;
+        if(schema.type === "combinator"){
+            instance = new PerlinCombine(<PerlinNode[]>inputs);
+        }else{
+            instance = new PerlinCombineWeighted(<NodeWeightPair[]>inputs);
+        }
+
+        this.nodes.set(schema.id, instance);
+        return instance;
+    }
+
+    private getCombinatorInputs(schema: NodeSchema): PerlinNode[] | NodeWeightPair[]{
+        debugger
         const props = schema.properties as CombinatorSchemaProperties;
 
         const sources: PerlinNode[] = [];
@@ -212,13 +276,16 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
         this.connections.forEach(conn => {
             if(conn.targetType === "default" && conn.idTo === schema.id){
+                if(schema.type == 'weighted-combinator' && conn.targetEntryNumber >= props.numOfInputs){
+                    return;
+                }
+
                 const source = this.getNodeInstance(conn.idFrom);
                 if(source){
-                    if(props.weighted){
-                        const weightInd = pairs.length;
+                    if(schema.type === "weighted-combinator"){
                         pairs.push({
                             node: source,
-                            weight: props.weights[weightInd]
+                            weight: props.weights[conn.targetEntryNumber]
                         })
                     }else{
                         sources.push(source);
@@ -227,15 +294,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             }
         })
 
-        let instance: PerlinNode;
-        if(props.weighted){
-            instance = new PerlinCombineWeighted(pairs);
-        }else{
-            instance = new PerlinCombine(sources);
-        }
-
-        this.nodes.set(schema.id, instance);
-        return instance;
+        return schema.type === "combinator" ? sources : pairs;
     }
 
     private instantiateFilter(schema: NodeSchema){

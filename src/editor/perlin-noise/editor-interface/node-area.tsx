@@ -1,7 +1,7 @@
 import { Component, MouseEvent, MouseEventHandler } from "react";
 import { ContextMenu, MenuEntry } from "./context.menu";
 import styles from "./node-area.module.scss";
-import { SourceNode } from "./source-node";
+import { PerlinNodeComponent } from "./perlin-node";
 import { NodeTreeBuilder } from "../perlin-node-tree";
 
 
@@ -84,26 +84,22 @@ export class NodeArea extends Component{
 
         return nodeSchemas.map( nodeSchema => {
 
-            if(nodeSchema.type == 'source'){
-                const menuTrigger = (evt: MouseEvent) => this.handleNodeContextClick(evt, nodeSchema.id);
-                const out = (changes: {}) => { 
-                    this.props.nodeTreeBuilder.updateNode(nodeSchema.id, changes);
-                    this.setState({});
-                }
-                const preview$ = this.props.nodeTreeBuilder.getPreviewStream(nodeSchema.id);
-
-                return (
-                    <SourceNode 
-                        key={nodeSchema.id.toString()} 
-                        schema={nodeSchema} 
-                        contextMenuTrigger={menuTrigger}
-                        outputTrigger={out}
-                        preview$={preview$}
-                    />
-                )
+            const menuTrigger = (evt: MouseEvent) => this.handleNodeContextClick(evt, nodeSchema.id);
+            const out = (changes: {}) => { 
+                this.props.nodeTreeBuilder.updateNode(nodeSchema.id, changes);
+                this.setState({});
             }
+            const preview$ = this.props.nodeTreeBuilder.getPreviewStream(nodeSchema.id);
 
-            return null;
+            return (
+                <PerlinNodeComponent 
+                    key={nodeSchema.id.toString()} 
+                    schema={nodeSchema} 
+                    contextMenuTrigger={menuTrigger}
+                    outputTrigger={out}
+                    preview$={preview$}
+                />
+            )
 
         })
     }
