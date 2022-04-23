@@ -26,6 +26,15 @@ export class PerlinNoise implements PerlinNode{
         this.seed = Math.abs( Math.floor(seed) );
     }
 
+    updateProperties(props: {[key: string]: number}){
+      if('size' in props){
+        this.size = props.size;
+      }
+      if('seed' in props){
+        this.seed = props.seed;
+      }
+    }
+
     /**
      * @returns perlin value for provided x and y map position.
      */

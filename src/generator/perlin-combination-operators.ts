@@ -4,6 +4,7 @@ import { PerlinNode } from './perlin-node'
  *  Sums up outputs of `PerlinNode` array.
  */
 export class PerlinCombine implements PerlinNode{
+
     constructor(private sources: PerlinNode[]) {
     }
 
@@ -16,10 +17,11 @@ export class PerlinCombine implements PerlinNode{
     updateSources(sources: PerlinNode[]){
         this.sources = sources;
     }
+
 }
 
 
-type NodeWeightPair = { node: PerlinNode, weight: number};
+export type NodeWeightPair = { node: PerlinNode, weight: number};
 /**
  *  Sums up weighted outputs of provided `PerlinNode` array.
  */

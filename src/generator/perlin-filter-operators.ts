@@ -65,7 +65,6 @@ export class PerlinFilter implements PerlinNode{
  *  Below are factory function for `PerlinFilter` class
  */
 
-
 /**
  * Scales input value.
  * Set `scale` to -1.0 to inverse.
