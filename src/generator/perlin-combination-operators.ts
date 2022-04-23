@@ -8,6 +8,9 @@ export class PerlinCombine implements PerlinNode{
     constructor(private sources: PerlinNode[]) {
     }
 
+    updateProperties(props: {[key: string]: number}){
+    }
+
     getValue(x: number, y: number): number {
         return this.sources.reduce( (prev: number, node: PerlinNode) => {
             return prev + node.getValue(x,y);
@@ -38,4 +41,8 @@ export class PerlinCombineWeighted implements PerlinNode{
     updateSources(sources: NodeWeightPair[]){
         this.sources = sources;
     }
+
+    updateProperties(props: {[key: string]: number}){
+    }
+    
 }

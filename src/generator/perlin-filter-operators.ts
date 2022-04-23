@@ -57,6 +57,10 @@ export class PerlinFilter implements PerlinNode{
         this.params = Object.assign({}, this.params, params);
         this.filter = this.filterFactory(this.source, params);
     }
+
+    
+    updateProperties(props: {[key: string]: number}){
+    }
 }
 
 

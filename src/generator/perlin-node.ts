@@ -5,4 +5,6 @@
  */
  export abstract class PerlinNode{
     abstract getValue(x: number, y: number): number;
+
+    abstract updateProperties(props: {[key: string]: number});
 }
