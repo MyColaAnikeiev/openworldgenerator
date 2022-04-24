@@ -1,3 +1,4 @@
+import { NodePropUpdateChanges } from "./types";
 import { PerlinNode } from './perlin-node'
 
 /* Type declarations */
@@ -59,7 +60,7 @@ export class PerlinFilter implements PerlinNode{
     }
 
     
-    updateProperties(props: {[key: string]: number}){
+    updateProperties(props: NodePropUpdateChanges){
     }
 }
 

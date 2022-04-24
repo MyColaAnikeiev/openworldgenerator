@@ -1,3 +1,4 @@
+import { NodePropUpdateChanges } from "./types";
 import { PerlinNode } from './perlin-node'
 
 /**
@@ -42,7 +43,13 @@ export class PerlinCombineWeighted implements PerlinNode{
         this.sources = sources;
     }
 
-    updateProperties(props: {[key: string]: number}){
+    updateProperties(props: NodePropUpdateChanges){
+        debugger
+        if(props.weight !== undefined){
+            if(this.sources.length > props.weight.index){
+                this.sources[props.weight.index].weight = props.weight.value;
+            }
+        }
     }
     
 }

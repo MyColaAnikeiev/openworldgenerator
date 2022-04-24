@@ -1,3 +1,4 @@
+import { NodePropUpdateChanges } from "./types";
 import { PerlinNode } from "./perlin-node";
 
 const permutation = [151,160,137,91,90,15,                 // Hash lookup table as defined by Ken Perlin.  This is a randomly
@@ -26,7 +27,7 @@ export class PerlinNoise implements PerlinNode{
         this.seed = Math.abs( Math.floor(seed) );
     }
 
-    updateProperties(props: {[key: string]: number}){
+    updateProperties(props: NodePropUpdateChanges){
       if('size' in props){
         this.size = props.size;
       }
