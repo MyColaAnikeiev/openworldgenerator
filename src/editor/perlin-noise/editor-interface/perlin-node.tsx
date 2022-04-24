@@ -1,5 +1,6 @@
 import { Component, MouseEvent } from "react"
 import { delay, Observable, Subject, takeUntil } from "rxjs";
+import { NodePropUpdateChanges } from "../../../generator/types";
 import { NodeSchema, SourceSchemaProperties } from "../types"
 import { CombinatorNodeProperties } from "./combinator-node-properties";
 import styles from './perlin-node.module.scss';
@@ -14,7 +15,9 @@ export class PerlinNodeComponent extends Component{
     props: { 
         schema: NodeSchema,
         contextMenuTrigger: (evt: MouseEvent) => void,
-        outputTrigger: (out: { [key: string]: any }) => void,
+        outputCallback: (out: NodePropUpdateChanges) => void,
+        connectionStartCallback: () => void;
+        connectionEndCallback: (connType: string, connIndex: number) => void;
         preview$: Observable<ImageData>;
     }
 
@@ -76,8 +79,10 @@ export class PerlinNodeComponent extends Component{
                     
                     {this.getPropertyControls()}
 
-                    <div className={styles.hook}>
-
+                    <div 
+                        className={styles.hook} 
+                        onMouseDown={() => this.props.connectionStartCallback()}
+                    >
                     </div>
                 </div>
             </div>
@@ -86,21 +91,26 @@ export class PerlinNodeComponent extends Component{
 
     getPropertyControls(){
         const {schema} = this.props;
-        const {outputTrigger: trigger} = this.props;
+        const {outputCallback: outputCallback} = this.props;
 
         switch(schema.type){
             case "source":
-                return <SourceNodeProperties schema={schema} outputTrigger={trigger}/>
+                return <SourceNodeProperties schema={schema} outputCallback={outputCallback}/>
             case "combinator":
             case "weighted-combinator":
-                return <CombinatorNodeProperties schema={schema} outputTrigger={trigger}/>
+                return (
+                    <CombinatorNodeProperties schema={schema} 
+                        outputCallback={outputCallback}
+                        connectionEndCallback={this.props.connectionEndCallback}
+                    />
+                )
         }
 
     }
 
     handleInput(evt: InputEvent){
         const elm = evt.target as HTMLInputElement;
-        this.props.outputTrigger({ [elm.name] : elm.value });
+        this.props.outputCallback({ [elm.name] : elm.value });
     }
 
     contextMenu(evt: MouseEvent){

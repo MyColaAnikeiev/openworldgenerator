@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { NodePropUpdateChanges } from "../../../generator/types";
 import { NodeSchema, SourceSchemaProperties } from "../types";
 
 import styles from "./source-node-properties.module.scss";
@@ -7,7 +8,7 @@ export class SourceNodeProperties extends Component{
 
     props: { 
         schema: NodeSchema,
-        outputTrigger: (out: { [key: string]: any }) => void,
+        outputCallback: (out: NodePropUpdateChanges) => void,
     }
 
 
@@ -40,6 +41,6 @@ export class SourceNodeProperties extends Component{
 
     handleInput(evt: InputEvent){
         const elm = evt.target as HTMLInputElement;
-        this.props.outputTrigger({ [elm.name] : elm.value });
+        this.props.outputCallback({ [elm.name] : elm.value });
     }
 }

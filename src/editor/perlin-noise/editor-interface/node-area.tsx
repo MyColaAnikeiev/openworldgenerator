@@ -3,10 +3,13 @@ import { ContextMenu, MenuEntry } from "./context.menu";
 import styles from "./node-area.module.scss";
 import { PerlinNodeComponent } from "./perlin-node";
 import { NodeTreeBuilder } from "../perlin-node-tree";
+import { CombinatorSchemaProperties, NodeConnection } from "../types";
+import { NodePropUpdateChanges } from "../../../generator/types";
 
 
 export class NodeArea extends Component{
 
+    bgCanvasRef: HTMLCanvasElement;
     nodeAreaHolderRef: HTMLDivElement;
 
     props: {
@@ -26,6 +29,11 @@ export class NodeArea extends Component{
             menuEntries: MenuEntry[]
         }
     }
+
+    connectionDrag = {
+        on: false,
+        outputId: 0
+    } 
     
     constructor(props){
         super(props);
@@ -33,8 +41,8 @@ export class NodeArea extends Component{
         this.state = {
             styles: {
                 nodeAreaSizes: {
-                    width: "1000px",
-                    height: "600px"
+                    width: "1300px",
+                    height: "700px"
                 }
             },
             contextMenu: {
@@ -43,22 +51,30 @@ export class NodeArea extends Component{
                 menuEntries: this.getMenuEntries()
             }
         };
+
+        setTimeout( () => {
+            this.renderConnections(null);
+        }, 0);
     }
 
     render(){
         const {nodeAreaSizes: areaSizes} = this.state.styles; 
         const nodes = this.getNodes();
+        const cancelConnection = () => { this.connectionDrag.on = false };
 
         return (
             <div 
                 className={styles['node-area']} 
                 style={areaSizes}
                 onMouseDown={this.handleMouseDown.bind(this)}
+                onMouseMove={(evt) => this.renderConnections(evt)}
+                onMouseUp={cancelConnection}
             > 
                 <canvas 
                     width={areaSizes.width}  
                     height={areaSizes.height}  
                     className={styles['node-area-bg-canvas']}
+                    ref={ref => this.bgCanvasRef = ref}
                 ></canvas>
 
                 <div 
@@ -85,18 +101,37 @@ export class NodeArea extends Component{
         return nodeSchemas.map( nodeSchema => {
 
             const menuTrigger = (evt: MouseEvent) => this.handleNodeContextClick(evt, nodeSchema.id);
-            const out = (changes: {}) => { 
+            const out = (changes: NodePropUpdateChanges) => { 
                 this.props.nodeTreeBuilder.updateNode(nodeSchema.id, changes);
                 this.setState({});
             }
             const preview$ = this.props.nodeTreeBuilder.getPreviewStream(nodeSchema.id);
+            const connectionStartCallback = () => {
+                this.connectionDrag.on = true;
+                this.connectionDrag.outputId = nodeSchema.id;
+            }
+            const connectionEndCallback = (connType: string, connInd: number) => {
+                if(this.connectionDrag.on){
+                    if(connType === "default"){
+                        this.props.nodeTreeBuilder.addConnection({
+                            idFrom: this.connectionDrag.outputId,
+                            idTo: nodeSchema.id,
+                            targetType: "default",
+                            targetEntryNumber: connInd
+                        });
+                    }
+                    this.connectionDrag.on = false;
+                }
+            }
 
             return (
                 <PerlinNodeComponent 
                     key={nodeSchema.id.toString()} 
                     schema={nodeSchema} 
                     contextMenuTrigger={menuTrigger}
-                    outputTrigger={out}
+                    outputCallback={out}
+                    connectionStartCallback={connectionStartCallback}
+                    connectionEndCallback={connectionEndCallback}
                     preview$={preview$}
                 />
             )
@@ -170,6 +205,70 @@ export class NodeArea extends Component{
         return {
             top: evt.clientY - sTop,
             left: evt.clientX - sLeft
+        }
+    }
+
+    renderConnections(evt: MouseEvent){
+        const connections = this.props.nodeTreeBuilder.getNodeConnections();
+        const nodes = this.props.nodeTreeBuilder.getNodeSchemas();
+        const ctx = this.bgCanvasRef.getContext("2d");
+
+        function getOutputPosition(id){
+            const scheme = nodes.find(scheme => scheme.id === id);
+            const x = scheme.position.left + 170;
+            let y = scheme.position.top;
+            switch(scheme.type){
+                case "source":
+                    y += 230;
+                    break;
+                case "combinator":
+                case "weighted-combinator":
+                    const weights = (scheme.properties as CombinatorSchemaProperties ).numOfInputs;
+                    y += 210 + weights * 26;
+                    break;
+                case "filter":
+                    throw new Error("Not implemented");
+            }
+
+            return {x,y};
+        }
+
+        function getInputPosition(connection: NodeConnection){
+            if(connection.targetType === "default"){
+                const scheme = nodes.find(scheme => scheme.id === connection.idTo);
+                
+                if(scheme.type === "combinator" || scheme.type === "weighted-combinator"){
+                    const props = scheme.properties as CombinatorSchemaProperties;
+                    const connIndex = connection.targetEntryNumber;
+                    const x = scheme.position.left + 2;
+                    const y = scheme.position.top + 210 + connIndex * 26;
+                    return {x,y}
+                }
+            }
+
+            throw new Error("Not implemented");
+        }
+        
+        const sizes = this.state.styles.nodeAreaSizes;
+        ctx.clearRect(0,0, parseInt(sizes.width), parseInt(sizes.height))
+        ctx.strokeStyle="#ddd";
+        ctx.lineWidth = 3;
+        connections.forEach(conn => {
+            const from = getOutputPosition(conn.idFrom);
+            const to = getInputPosition(conn);
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.bezierCurveTo(from.x+80,from.y, to.x - 80,to.y, to.x, to.y);
+            ctx.stroke();
+        })
+
+        if(this.connectionDrag.on){
+            const from = getOutputPosition(this.connectionDrag.outputId);
+            const to = this.getPositionFromEvent(evt);
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.bezierCurveTo(from.x+80,from.y, to.left - 80,to.top, to.left, to.top);
+            ctx.stroke();
         }
     }
 

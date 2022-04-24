@@ -1,4 +1,5 @@
-import { Component } from "react";
+import { Component, FormEvent } from "react";
+import { NodePropUpdateChanges } from "../../../generator/types";
 import { CombinatorSchemaProperties, NodeSchema } from "../types";
 import styles from "./combinator-node-properties.module.scss";
 
@@ -6,7 +7,8 @@ export class CombinatorNodeProperties extends Component{
     
     props: { 
         schema: NodeSchema,
-        outputTrigger: (out: { [key: string]: any }) => void,
+        outputCallback: (out: NodePropUpdateChanges) => void,
+        connectionEndCallback: (connType: string, connInd: number) => void
     }
 
     render(){
@@ -18,7 +20,7 @@ export class CombinatorNodeProperties extends Component{
                 <div className={styles.row}>
                     <label>Use:</label>
                     <input
-                        name="num-of-inputs"
+                        name="numOfInputs"
                         type="number" min="2" max="255"
                         onInput={this.handleInput.bind(this)}
                         value={properties.numOfInputs}
@@ -37,12 +39,15 @@ export class CombinatorNodeProperties extends Component{
         const inputs = Array.from(Array(properties.numOfInputs)).map((_, ind: number) => {
             return (
                 <div key={ind.toString()} className={styles.row}>
-                    <div className={styles['input-hook']}></div>
+                    <div 
+                        className={styles['input-hook']}
+                        onMouseUp={() => this.props.connectionEndCallback("default", ind)}
+                    ></div>
                     { weighted && 
                      <input
-                        name={ "weight-" + ind.toString()}
+                        name="weight"
                         type="number" step="0.1"
-                        onInput={this.handleInput.bind(this)}
+                        onInput={(evt: FormEvent) => this.handleInput(evt, ind)}
                         value={properties.weights[ind]}
                     />
                     }
@@ -54,9 +59,20 @@ export class CombinatorNodeProperties extends Component{
     }
 
 
-    handleInput(evt: InputEvent){
+    handleInput(evt: FormEvent, connectionIndex?: number){
         const elm = evt.target as HTMLInputElement;
-        this.props.outputTrigger({ [elm.name] : elm.value });
+
+        if(elm.name === "weight"){
+            this.props.outputCallback({ weight: { 
+                    index: connectionIndex,
+                    value: parseFloat(elm.value) 
+                }
+            })
+        }
+        if(elm.name === "numOfInputs"){
+            this.props.outputCallback({numOfInputs: Number(elm.value)});
+        }
     }
+
 
 }

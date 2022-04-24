@@ -12,6 +12,7 @@ import {
 
 import { PerlinNode } from "../../generator/perlin-node"
 import { PerlinNoise } from "../../generator/perlin-noise";
+import { NodePropUpdateChanges } from "../../generator/types";
 import { getImageFromPerlinNode } from "./tools";
 
 import { 
@@ -20,7 +21,7 @@ import {
     NodeConnection, 
     NodeSchema, 
     NodeSchemaProperties, 
-    NodeSchemaType, 
+    NodeSchemaType,  
     SourceSchemaProperties } from "./types"
 
 
@@ -31,7 +32,9 @@ export interface NodeTreeBuilder{
 
     addNode(type: NodeSchemaType, top: number, left: number): void;
     removeNode(id: number): void;
-    updateNode(id: number, changes: {}): void;
+    updateNode(id: number, changes: NodePropUpdateChanges): void;
+
+    addConnection(conn: NodeConnection): void;
 
     getPreviewStream(
         id: number, scale?:number, width?: number, height?: number)
@@ -50,7 +53,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             type: 'source',
             position: { top: 70, left: 200 },
             properties: {
-                size: 1,
+                size: 0.6,
                 seed: 0
             }
         },
@@ -59,8 +62,8 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             type: 'source',
             position: { top: 300, left: 120 },
             properties: {
-                size: 1,
-                seed: 0
+                size: 1.8,
+                seed: 1
             }
         },
         {
@@ -69,7 +72,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             position: { top: 320, left: 420 },
             properties: {
                 numOfInputs: 2,
-                weights: [1.0,1.0]
+                weights: [0.6,1.0]
             }
         }
     ];
@@ -85,6 +88,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
     constructor(){
     }
+
 
     addNode(type: NodeSchemaType, top: number, left: number){
         const maxId = this.nodeSchemas.reduce(
@@ -117,41 +121,48 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
         this.updated$.next(maxId + 1);
     }
 
-    updateNode(id: number, changes: {}){
+    updateNode(id: number, changes: NodePropUpdateChanges){
         const schema = this.nodeSchemas.find(schema => schema.id === id);
         const node = this.getNodeInstance(schema.id)
 
-        if(schema.type === "source"){
-            if(schema){
-                schema.properties = Object.assign(schema.properties, changes);
-            }
+        if(node){
             node.updateProperties(changes);
         }
 
+        if(schema.type === "source"){
+            schema.properties = Object.assign(schema.properties, changes);
+        }
+
+
         if(schema.type === "combinator" || schema.type === "weighted-combinator"){
+            debugger
             const prop = schema.properties as CombinatorSchemaProperties;
-            const numOfInputs = Number(changes["num-of-inputs"]);
-            if(numOfInputs < 2){
-                return;
-            }
 
-            if(schema.type === "combinator"){
-                if("num-of-inputs" in changes){
-                    prop.numOfInputs = numOfInputs;
-                    (node as PerlinCombine).updateSources(<PerlinNode[]>this.getCombinatorInputs(schema))
-                }
-            }
+            if(changes.numOfInputs !== undefined){
+                let numOfInputs = changes.numOfInputs;
+                numOfInputs = numOfInputs >= 2 ? numOfInputs : 2;
 
-            if(schema.type === "weighted-combinator"){
-                if("num-of-inputs" in changes){
-                    if(prop.numOfInputs < numOfInputs){
+                if(schema.type === "weighted-combinator"){
+                    if(prop.weights.length < numOfInputs){
                         for(let i = 0; i < numOfInputs - prop.numOfInputs; i++){
                             prop.weights.push(1.0);
                         }
                     }
-                    prop.numOfInputs = numOfInputs;
-                    (node as PerlinCombineWeighted).updateSources(<NodeWeightPair[]>this.getCombinatorInputs(schema))
                 }
+                prop.numOfInputs = numOfInputs;
+            }
+
+            if(changes.weight !== undefined){
+                prop.weights[changes.weight.index] = changes.weight.value;
+            }
+
+            if(schema.type === "combinator"){
+                const comb = node as PerlinCombine;
+                comb.updateSources(<PerlinNode[]>this.getCombinatorInputs(schema))
+            }
+            if(schema.type === "weighted-combinator"){
+                const comb = node as PerlinCombineWeighted;
+                comb.updateSources(<NodeWeightPair[]>this.getCombinatorInputs(schema))
             }
 
         }
@@ -171,6 +182,18 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
     getNodeSchemas(): NodeSchema[]{
         return this.nodeSchemas;
+    }
+
+
+    addConnection(conn: NodeConnection): void{
+        // Clear dublication or one that pointing to the same input
+        this.connections = this.connections.filter(other => {
+            return other.idTo !== conn.idTo || other.targetType !== conn.targetType
+                || other.targetEntryNumber !== conn.targetEntryNumber
+        })
+        this.connections.push(conn);
+
+        this.updateNode(conn.idTo, {});
     }
 
     getNodeConnections(): NodeConnection[]{
@@ -268,7 +291,6 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
     }
 
     private getCombinatorInputs(schema: NodeSchema): PerlinNode[] | NodeWeightPair[]{
-        debugger
         const props = schema.properties as CombinatorSchemaProperties;
 
         const sources: PerlinNode[] = [];
