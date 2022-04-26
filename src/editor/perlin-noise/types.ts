@@ -10,16 +10,27 @@ export type CombinatorSchemaProperties = {
     weights?: number[];
 };
 
+export type PerlinFilterType = "scale" | "dynamic-scale" | "binary";
+
 export type FilterSchemaProperties = {
-    filterType: "scale" | "dynamic-scale" | "binary";
+    filterType: PerlinFilterType
     scale?: number,
     threshold?: number
     upperValue?: number,
     lowerValue?: number
 }
 
-export type NodeSchemaProperties = 
-    SourceSchemaProperties | CombinatorSchemaProperties | FilterSchemaProperties;
+export type NodeSchemaProperties = {
+    size?: number,
+    seed?: number
+    numOfInputs?: number;
+    weights?: number[];
+    filterType?: PerlinFilterType
+    scale?: number,
+    threshold?: number
+    upperValue?: number,
+    lowerValue?: number
+}
 
 export interface NodeSchema{ 
     id: number,
@@ -31,6 +42,7 @@ export interface NodeSchema{
     },
     properties: NodeSchemaProperties
 }
+
 
 export type NodeConnection = {
     idTo: number,
