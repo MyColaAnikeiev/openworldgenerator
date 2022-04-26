@@ -1,8 +1,9 @@
 import { Component, MouseEvent } from "react"
 import { delay, Observable, Subject, takeUntil } from "rxjs";
-import { NodePropUpdateChanges } from "../../../generator/types";
+import { NodeParamsUpdateChanges } from "../../../generator/types";
 import { NodeSchema, SourceSchemaProperties } from "../types"
 import { CombinatorNodeProperties } from "./combinator-node-properties";
+import { FilterNodeProperties } from "./filter-node-properties";
 import styles from './perlin-node.module.scss';
 import { SourceNodeProperties } from "./source-node-properties";
 
@@ -15,7 +16,7 @@ export class PerlinNodeComponent extends Component{
     props: { 
         schema: NodeSchema,
         contextMenuTrigger: (evt: MouseEvent) => void,
-        outputCallback: (out: NodePropUpdateChanges) => void,
+        outputCallback: (out: NodeParamsUpdateChanges) => void,
         connectionStartCallback: () => void;
         connectionEndCallback: (connType: string, connIndex: number) => void;
         preview$: Observable<ImageData>;
@@ -91,7 +92,7 @@ export class PerlinNodeComponent extends Component{
 
     getPropertyControls(){
         const {schema} = this.props;
-        const {outputCallback: outputCallback} = this.props;
+        const {outputCallback} = this.props;
 
         switch(schema.type){
             case "source":
@@ -100,6 +101,13 @@ export class PerlinNodeComponent extends Component{
             case "weighted-combinator":
                 return (
                     <CombinatorNodeProperties schema={schema} 
+                        outputCallback={outputCallback}
+                        connectionEndCallback={this.props.connectionEndCallback}
+                    />
+                )
+            case "filter":
+                return (
+                    <FilterNodeProperties schema={schema} 
                         outputCallback={outputCallback}
                         connectionEndCallback={this.props.connectionEndCallback}
                     />
