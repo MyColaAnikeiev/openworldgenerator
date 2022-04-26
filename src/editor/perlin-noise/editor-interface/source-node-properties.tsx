@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { NodePropUpdateChanges } from "../../../generator/types";
+import { NodeParamsUpdateChanges } from "../../../generator/types";
 import { NodeSchema, SourceSchemaProperties } from "../types";
 
 import styles from "./source-node-properties.module.scss";
@@ -8,7 +8,7 @@ export class SourceNodeProperties extends Component{
 
     props: { 
         schema: NodeSchema,
-        outputCallback: (out: NodePropUpdateChanges) => void,
+        outputCallback: (out: NodeParamsUpdateChanges) => void,
     }
 
 

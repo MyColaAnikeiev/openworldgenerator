@@ -1,5 +1,5 @@
 import { Component, FormEvent } from "react";
-import { NodePropUpdateChanges } from "../../../generator/types";
+import { NodeParamsUpdateChanges } from "../../../generator/types";
 import { CombinatorSchemaProperties, NodeSchema } from "../types";
 import styles from "./combinator-node-properties.module.scss";
 
@@ -7,7 +7,7 @@ export class CombinatorNodeProperties extends Component{
     
     props: { 
         schema: NodeSchema,
-        outputCallback: (out: NodePropUpdateChanges) => void,
+        outputCallback: (out: NodeParamsUpdateChanges) => void,
         connectionEndCallback: (connType: string, connInd: number) => void
     }
 
