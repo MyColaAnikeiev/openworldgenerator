@@ -12,7 +12,7 @@ import {
 
 import { PerlinNode } from "../../generator/perlin-node"
 import { PerlinNoise } from "../../generator/perlin-noise";
-import { NodePropUpdateChanges } from "../../generator/types";
+import { NodeParamsUpdateChanges } from "../../generator/types";
 import { getImageFromPerlinNode } from "./tools";
 
 import { 
@@ -22,6 +22,7 @@ import {
     NodeSchema, 
     NodeSchemaProperties, 
     NodeSchemaType,  
+    PerlinFilterType,  
     SourceSchemaProperties } from "./types"
 
 
@@ -30,9 +31,9 @@ export interface NodeTreeBuilder{
     getNodeSchemas(): NodeSchema[];
     getNodeConnections(): NodeConnection[];
 
-    addNode(type: NodeSchemaType, top: number, left: number): void;
+    addNode(type: NodeSchemaType, subtype: PerlinFilterType | null, top: number, left: number): void;
     removeNode(id: number): void;
-    updateNode(id: number, changes: NodePropUpdateChanges): void;
+    updateNodeParameters(id: number, changes: NodeParamsUpdateChanges): void;
 
     addConnection(conn: NodeConnection): void;
 
@@ -47,67 +48,45 @@ export interface NodeTreeUser{
 
 export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
-    private nodeSchemas: NodeSchema[] = [
-        {
-            id: 1,
-            type: 'source',
-            position: { top: 70, left: 200 },
-            properties: {
-                size: 0.6,
-                seed: 0
-            }
-        },
-        {
-            id: 3,
-            type: 'source',
-            position: { top: 300, left: 120 },
-            properties: {
-                size: 1.8,
-                seed: 1
-            }
-        },
-        {
-            id: 2,
-            type: 'weighted-combinator',
-            position: { top: 320, left: 420 },
-            properties: {
-                numOfInputs: 2,
-                weights: [0.6,1.0]
-            }
-        }
-    ];
-
     private nodes: Map<number, PerlinNode> = new Map();
-    private connections: NodeConnection[] = [
-        { targetType: "default", idFrom: 1, idTo: 2, targetEntryNumber: 0},
-        { targetType: "default", idFrom: 3, idTo: 2, targetEntryNumber: 1}
-    ];
 
     // 
     public updated$: Subject<number> = new Subject();
 
-    constructor(){
+    constructor(private nodeSchemas: NodeSchema[], private connections: NodeConnection[]){
     }
 
 
-    addNode(type: NodeSchemaType, top: number, left: number){
-        const maxId = this.nodeSchemas.reduce(
-            (max, schema) => (max < schema.id ? schema.id : max)
-        ,0);
+    addNode(
+        type: NodeSchemaType, subtype: PerlinFilterType | null,  top: number, left: number
+    ){
+        const maxId = this.getMaxOfSchemaProperty("id");
 
         let props: NodeSchemaProperties;
         switch (type){
             case "source":
-                props = { size: 1.0, seed: 0 }
+                // Make default seeds apear with interval of 16 
+                const maxSeed = Math.ceil((this.getMaxOfSchemaProperty("seed")+1)/16)*16;
+                this.nodeSchemas[0].properties.seed
+                props = { size: 1.0, seed: maxSeed }
                 break;
             case "combinator":
-                props = { numOfInputs: 2}
-                break;
             case "weighted-combinator":
                 props = { numOfInputs: 2, weights: [1.0, 1.0]};
                 break;
             case "filter":
-                props = { filterType: "scale",  scale: 1.0 }
+                switch(subtype){
+                    case "scale":
+                        props = { filterType: "scale",  scale: 1.0 }
+                        break;
+                    case "dynamic-scale":
+                        props = { filterType: "dynamic-scale" }
+                        break;
+                    case "binary":
+                        props = { filterType: "binary", threshold: 0.6, lowerValue: 0, upperValue: 1}
+                        break;
+                }
+                break;
         }
 
 
@@ -121,62 +100,84 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
         this.updated$.next(maxId + 1);
     }
 
-    updateNode(id: number, changes: NodePropUpdateChanges){
+    updateNodeParameters(id: number, changes: NodeParamsUpdateChanges){
         const schema = this.nodeSchemas.find(schema => schema.id === id);
-        const node = this.getNodeInstance(schema.id)
+        const node = this.getNodeInstance(id);
 
         if(node){
-            node.updateProperties(changes);
+            node.updateParameters(changes);
         }
 
-        if(schema.type === "source"){
+        /* Just copy */
+        if(schema){
             schema.properties = Object.assign(schema.properties, changes);
         }
 
-
-        if(schema.type === "combinator" || schema.type === "weighted-combinator"){
-            debugger
-            const prop = schema.properties as CombinatorSchemaProperties;
+        /* Special cases */
+        if(schema.type === "weighted-combinator"){
 
             if(changes.numOfInputs !== undefined){
-                let numOfInputs = changes.numOfInputs;
-                numOfInputs = numOfInputs >= 2 ? numOfInputs : 2;
+                const prop = schema.properties;
+                const numOfInputs = changes.numOfInputs;
 
-                if(schema.type === "weighted-combinator"){
-                    if(prop.weights.length < numOfInputs){
-                        for(let i = 0; i < numOfInputs - prop.numOfInputs; i++){
-                            prop.weights.push(1.0);
-                        }
-                    }
+                while(prop.weights.length < numOfInputs){
+                    prop.weights.push(1.0);
                 }
-                prop.numOfInputs = numOfInputs;
             }
 
             if(changes.weight !== undefined){
-                prop.weights[changes.weight.index] = changes.weight.value;
+                if(schema.properties.weights.length > changes.weight.index){
+                    schema.properties.weights[changes.weight.index] = changes.weight.value;
+                }
             }
-
-            if(schema.type === "combinator"){
-                const comb = node as PerlinCombine;
-                comb.updateSources(<PerlinNode[]>this.getCombinatorInputs(schema))
-            }
-            if(schema.type === "weighted-combinator"){
-                const comb = node as PerlinCombineWeighted;
-                comb.updateSources(<NodeWeightPair[]>this.getCombinatorInputs(schema))
-            }
-
         }
-        
+
+        // My need to rebuild
+        if(changes.numOfInputs !== undefined){
+            this.updateNodeConnections(id);
+        }
+
         this.updated$.next(id);
     }
 
+    updateNodeConnections(id: number){
+        const schema = this.nodeSchemas.find(schema => schema.id === id);
+
+        this.nodes.delete(id);
+        this.getNodeInstance(id);
+
+        this.connections.filter(conn => conn.idFrom === id)
+            .forEach(conn => this.updateNodeConnections(conn.idTo));
+    }
+
+    getMaxOfSchemaProperty(prop: "id" | "seed"): number{
+        switch(prop){
+            case "id":
+                return this.nodeSchemas.reduce(
+                    (max, schema) => (max < schema.id ? schema.id : max)
+                ,0);
+            case "seed":
+                return this.nodeSchemas
+                    .map(schema => schema.properties.seed !== undefined ? schema.properties.seed : 0)
+                    .reduce( (prev, seed) => seed > prev ? seed : prev
+                    ,0);
+        }
+    }
+
     removeNode(id: number){
+        const outConnections = this.connections.filter(conn => conn.idFrom === id);
         // Remove connections if present
         this.connections = this.connections
             .filter( (con: NodeConnection) => (con.idFrom !== id && con.idTo !== id));
 
         const index = this.nodeSchemas.findIndex(node => node.id == id);
         this.nodeSchemas.splice(index, 1);
+        this.nodes.delete(id);
+
+        outConnections.forEach((conn) => {
+            this.updateNodeConnections(conn.idTo);
+            this.updated$.next(conn.idTo);
+        });
         this.updated$.next(id);
     }
 
@@ -186,15 +187,44 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
 
     addConnection(conn: NodeConnection): void{
-        // Clear dublication or one that pointing to the same input
-        this.connections = this.connections.filter(other => {
-            return other.idTo !== conn.idTo || other.targetType !== conn.targetType
-                || other.targetEntryNumber !== conn.targetEntryNumber
-        })
-        this.connections.push(conn);
+        if(!this.checkConnectionForLoop(conn)){
+            // Clear dublication or one that pointing to the same input
+            this.connections = this.connections.filter(other => {
+                return other.idTo !== conn.idTo || other.targetType !== conn.targetType
+                    || other.targetEntryNumber !== conn.targetEntryNumber
+            })
 
-        this.updateNode(conn.idTo, {});
+            this.connections.push(conn);
+            this.updateNodeConnections(conn.idTo);
+            this.updated$.next(conn.idTo);
+        }
     }
+
+    /**
+     * @returns - returns `true` if connection causes loops. 
+     */
+    checkConnectionForLoop(connection: NodeConnection): boolean{
+        const visited: boolean[] = this.connections.map(() => false);
+
+        const checkForLoop = (curr: NodeConnection): boolean => {
+            const curIndex = this.connections.findIndex(conn => conn === curr);
+            if(curIndex !== undefined && visited[curIndex]){
+                return false;
+            }
+            if(curr.idFrom === connection.idTo){
+                return true;
+            }
+            if(curIndex !== undefined){
+                visited[curIndex] = true;
+            }
+
+            return this.connections.filter(conn => conn.idTo === curr.idFrom)
+                .some(checkForLoop);
+        }
+
+        return checkForLoop(connection);
+    }
+
 
     getNodeConnections(): NodeConnection[]{
         return this.connections;
@@ -322,7 +352,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
     private instantiateFilter(schema: NodeSchema){
         const inputId = this.connections.find(conn => {
             return conn.idTo === schema.id && conn.targetType === "default";
-        }).idFrom;
+        })?.idFrom;
 
         if(inputId === undefined){
             return null;
@@ -344,7 +374,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
                 break;
             case "dynamic-scale":
                 const controlId = this.connections
-                    .find(conn => conn.idTo === schema.id && conn.targetType === "scale-filter.control").idFrom
+                    .find(conn => conn.idTo === schema.id && conn.targetType === "scale-filter.control")?.idFrom
                 if(controlId === undefined){
                     return null;
                 }
