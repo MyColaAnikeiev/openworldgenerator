@@ -43,13 +43,15 @@ export class CombinatorNodeProperties extends Component{
                         className={styles['input-hook']}
                         onMouseUp={() => this.props.connectionEndCallback("default", ind)}
                     ></div>
-                    { weighted && 
+                    { weighted ?
                      <input
                         name="weight"
                         type="number" step="0.1"
                         onInput={(evt: FormEvent) => this.handleInput(evt, ind)}
                         value={properties.weights[ind]}
                     />
+                    :
+                    <label className={styles['input-label']}>Input</label>
                     }
                 </div>
             )

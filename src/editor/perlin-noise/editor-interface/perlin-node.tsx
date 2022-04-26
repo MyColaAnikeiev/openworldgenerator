@@ -67,7 +67,9 @@ export class PerlinNodeComponent extends Component{
                     onMouseLeave={this.dragOver.bind(this)}
                     onContextMenu={this.contextMenu.bind(this)}
                 >
-                    <div className={styles.head}></div>
+                    <div className={styles.head}>
+                        <span>{this.getNodeTitle()}</span>
+                    </div>
                     <div className={styles.preview}>
                             <canvas 
                                 ref={ref => this.canvasRef = ref}
@@ -88,6 +90,14 @@ export class PerlinNodeComponent extends Component{
                 </div>
             </div>
         )      
+    }
+
+    getNodeTitle(): string{
+        const {schema} = this.props;
+        if(schema.type === "filter"){
+            return schema.properties.filterType;
+        }
+        return schema.type;
     }
 
     getPropertyControls(){

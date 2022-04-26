@@ -16,9 +16,12 @@ $textColor: rgb(170, 170, 170);
     user-select: none; /* Standard */
 
     .head{
-        height: 11px;
+        height: 16px;
+        padding-top: 5px;
         background-color: inherit;
         border-radius: 6px 6px 0 0;
+        font-size: 12px;
+        text-align: center;
     }
 
     .body{

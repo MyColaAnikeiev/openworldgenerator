@@ -4,6 +4,7 @@
 
 .row{
     display: grid;
+    height: 26px;
     grid-template-columns: 55px 1fr;
 
     .input-hook{
@@ -26,5 +27,12 @@
         font-size: 1.1em;
         padding: 1px 0 1px 5px;
         box-sizing: border-box;
+    }
+
+    .input-label{
+        position: relative;
+        left: -25px;
+        align-self: center;
+        font-size: 12px;
     }
 }

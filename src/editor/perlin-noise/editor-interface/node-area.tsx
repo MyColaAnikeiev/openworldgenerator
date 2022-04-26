@@ -218,15 +218,23 @@ export class NodeArea extends Component{
             let y = scheme.position.top;
             switch(scheme.type){
                 case "source":
-                    y += 230;
+                    y += 234;
                     break;
                 case "combinator":
                 case "weighted-combinator":
                     const weights = (scheme.properties as CombinatorSchemaProperties ).numOfInputs;
-                    y += 210 + weights * 26;
+                    y += 226 + weights * 26;
                     break;
                 case "filter":
-                    y += 186;
+                    switch(scheme.properties.filterType){
+                        case "scale":
+                        case "dynamic-scale":
+                            y += 222;
+                            break;
+                        case "binary":
+                            y += 275;
+                            break
+                    }
                     break;
             }
 
@@ -240,18 +248,18 @@ export class NodeArea extends Component{
                 const props = scheme.properties as CombinatorSchemaProperties;
                 const connIndex = connection.targetEntryNumber;
                 const x = scheme.position.left + 2;
-                const y = scheme.position.top + 210 + connIndex * 26;
+                const y = scheme.position.top + 224 + connIndex * 26;
                 return {x,y}
             }
 
             if(scheme.type === "filter"){
                 if(scheme.properties.filterType === "dynamic-scale"){
                     if(connection.targetType === "scale-filter.control"){
-                        return {x: scheme.position.left, y: scheme.position.top + 182}
+                        return {x: scheme.position.left, y: scheme.position.top + 192}
                     }
                 }
 
-                return {x: scheme.position.left, y: scheme.position.top + 158}
+                return {x: scheme.position.left, y: scheme.position.top + 168}
             }
         }
         

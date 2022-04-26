@@ -21,8 +21,8 @@ export class FilterNodeProperties extends Component{
                         className={styles['input-hook']}
                         onMouseUp={() => this.props.connectionEndCallback("default", 0)}
                     ></div>
-                    <label>
-                        
+                    <label className={styles['input-label']}>
+                        Input
                     </label>
                 </div>
 
@@ -40,7 +40,7 @@ export class FilterNodeProperties extends Component{
                 return [
                     (
                         <div key="scale" className={styles.row}>
-                            <label>Scale</label>
+                            <label>Scale:</label>
                             <input
                                 name="scale"
                                 type="number" step="0.1"
@@ -58,8 +58,8 @@ export class FilterNodeProperties extends Component{
                                 className={styles['input-hook']}
                                 onMouseUp={() => this.props.connectionEndCallback("scale-filter.control", 0)}
                             ></div>
-                            <label>
-                                
+                            <label className={styles['input-label']}>
+                                Input
                             </label>
                         </div>
                     )
@@ -67,7 +67,7 @@ export class FilterNodeProperties extends Component{
             case "binary": 
                 return [(
                         <div key="threshold" className={styles.row}>
-                            <label>Threshold</label>
+                            <label>Threshold:</label>
                             <input
                                 name="threshold"
                                 type="number" step="0.05"
@@ -78,7 +78,7 @@ export class FilterNodeProperties extends Component{
                     ),
                     (
                         <div key="upperValue" className={styles.row}>
-                            <label>top</label>
+                            <label>top:</label>
                             <input
                                 name="upperValue"
                                 type="number" step="0.1"
@@ -89,7 +89,7 @@ export class FilterNodeProperties extends Component{
                     ),
                     (
                         <div key="loverValue" className={styles.row}>
-                            <label>bottom</label>
+                            <label>bottom:</label>
                             <input
                                 name="lowerValue"
                                 type="number" step="0.1"
