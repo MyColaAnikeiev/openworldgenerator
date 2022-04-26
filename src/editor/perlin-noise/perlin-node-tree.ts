@@ -77,7 +77,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             case "filter":
                 switch(subtype){
                     case "scale":
-                        props = { filterType: "scale",  scale: 1.0 }
+                        props = { filterType: "scale",  scale: 1.0, add: 0.0 }
                         break;
                     case "dynamic-scale":
                         props = { filterType: "dynamic-scale" }

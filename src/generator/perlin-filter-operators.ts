@@ -1,17 +1,5 @@
-import { NodeParamsUpdateChanges } from "./types";
+import { FilterFactory, FilterParams, NodeParamsUpdateChanges } from "./types";
 import { PerlinNode } from './perlin-node'
-
-/* Type declarations */
-export type FilterParams = { 
-    scale?: number,
-    threshold?: number
-    upperValue?: number,
-    lowerValue?: number
-    controlNode?: PerlinNode
-}
-export type FilterFactory = (node: PerlinNode, params: FilterParams) => ((x: number, y:number) => number)
-
-
 
 /**
  * Input source, filter function or params could be changed on fly 
@@ -73,9 +61,10 @@ export class PerlinFilter implements PerlinNode{
  */
 export function PerlinScaleFilterFactory(node: PerlinNode, params : FilterParams){
     const scale = "scale" in params ? params.scale : 1.0;
-
+    const add = "add" in params ? params.add : 0.0;
+ 
     return function(x: number, y: number){
-        return node.getValue(x,y) * scale;
+        return node.getValue(x,y) * scale + add;
     }
 }
 

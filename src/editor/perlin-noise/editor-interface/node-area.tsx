@@ -228,6 +228,8 @@ export class NodeArea extends Component{
                 case "filter":
                     switch(scheme.properties.filterType){
                         case "scale":
+                            y += 248;
+                            break;
                         case "dynamic-scale":
                             y += 222;
                             break;

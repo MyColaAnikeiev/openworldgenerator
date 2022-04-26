@@ -27,6 +27,7 @@ export type NodeSchemaProperties = {
     weights?: number[];
     filterType?: PerlinFilterType
     scale?: number,
+    add?: number,
     threshold?: number
     upperValue?: number,
     lowerValue?: number

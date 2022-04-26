@@ -48,6 +48,17 @@ export class FilterNodeProperties extends Component{
                                 value={properties.scale}
                             />
                         </div>
+                    ),
+                    (
+                        <div key="add" className={styles.row}>
+                            <label>Add:</label>
+                            <input
+                                name="add"
+                                type="number" step="0.1"
+                                onInput={(evt: FormEvent) => this.handleInput(evt)}
+                                value={properties.add}
+                            />
+                        </div>
                     )
                 ]
             case "dynamic-scale":
@@ -108,6 +119,9 @@ export class FilterNodeProperties extends Component{
         
         if(elm.name === "scale"){
             this.props.outputCallback({scale: parseFloat(elm.value)})
+        }
+        if(elm.name === "add"){
+            this.props.outputCallback({add: parseFloat(elm.value)})
         }
 
         if(elm.name === "threshold"){
