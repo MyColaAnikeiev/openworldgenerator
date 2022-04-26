@@ -15,6 +15,7 @@ export type PerlinFilterType = "scale" | "dynamic-scale" | "binary";
 export type FilterSchemaProperties = {
     filterType: PerlinFilterType
     scale?: number,
+    add?: number,
     threshold?: number
     upperValue?: number,
     lowerValue?: number
