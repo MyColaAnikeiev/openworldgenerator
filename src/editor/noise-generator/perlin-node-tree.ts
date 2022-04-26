@@ -68,7 +68,6 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
             case "source":
                 // Make default seeds apear with interval of 16 
                 const maxSeed = Math.ceil((this.getMaxOfSchemaProperty("seed")+1)/8)*8;
-                this.nodeSchemas[0].properties.seed
                 props = { size: 1.0, seed: maxSeed }
                 break;
             case "combinator":
@@ -270,7 +269,6 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
             map(() => {
                 const node = this.getNodeInstance(id);
                 if(node){
-                    debugger
                     return getImageFromGeneratorNode(node, scale, width, height);
                 }
                 // Return blank if node can't be instantiated.
