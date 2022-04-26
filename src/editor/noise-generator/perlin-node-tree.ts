@@ -134,6 +134,10 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
         // May need to rebuild
         if(changes.numOfInputs !== undefined){
+            // Clear unfited connections
+            this.connections = this.connections.filter(conn => {
+                return conn.idTo !== schema.id || conn.targetEntryNumber < changes.numOfInputs;
+            })
             this.updateNodeConnections(id);
         }
 
@@ -141,7 +145,6 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
     }
 
     updateNodeConnections(id: number){
-        debugger
         const schema = this.nodeSchemas.find(schema => schema.id === id);
 
         this.nodes.delete(id);
