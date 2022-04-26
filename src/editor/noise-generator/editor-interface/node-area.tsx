@@ -3,7 +3,7 @@ import { ContextMenu, MenuEntry } from "./context.menu";
 import styles from "./node-area.module.scss";
 import { PerlinNodeComponent } from "./perlin-node";
 import { NodeTreeBuilder } from "../perlin-node-tree";
-import { CombinatorSchemaProperties, NodeConnection } from "../types";
+import { CombinatorSchemaProperties, NodeConnection, NodeSchemaSubtype, NodeSchemaType } from "../types";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
 
 
@@ -221,12 +221,11 @@ export class NodeArea extends Component{
                     y += 234;
                     break;
                 case "combinator":
-                case "weighted-combinator":
                     const weights = (scheme.properties as CombinatorSchemaProperties ).numOfInputs;
                     y += 226 + weights * 26;
                     break;
                 case "filter":
-                    switch(scheme.properties.filterType){
+                    switch(scheme.subtype){
                         case "scale":
                             y += 248;
                             break;
@@ -245,9 +244,8 @@ export class NodeArea extends Component{
 
         function getInputPosition(connection: NodeConnection){
             const scheme = nodes.find(scheme => scheme.id === connection.idTo);
-            
-            if(scheme.type === "combinator" || scheme.type === "weighted-combinator"){
-                const props = scheme.properties as CombinatorSchemaProperties;
+
+            if(scheme.type === "combinator"){
                 const connIndex = connection.targetEntryNumber;
                 const x = scheme.position.left + 2;
                 const y = scheme.position.top + 224 + connIndex * 26;
@@ -255,7 +253,7 @@ export class NodeArea extends Component{
             }
 
             if(scheme.type === "filter"){
-                if(scheme.properties.filterType === "dynamic-scale"){
+                if(scheme.subtype === "dynamic-scale"){
                     if(connection.targetType === "scale-filter.control"){
                         return {x: scheme.position.left, y: scheme.position.top + 192}
                     }
@@ -291,32 +289,12 @@ export class NodeArea extends Component{
 
     /* Maybe cache it latter.*/
     getMenuEntries(): MenuEntry[]{
-
-        const addSourceAction = (evt) => {
-            const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("source", null, top - 30 ,left - 60)
-        }
-
-        const addCombinatorAction = (evt) => {
-            const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("combinator", null, top - 30 ,left - 60)
-        }
-        const addWeightedCombinatorAction = (evt) => {
-            const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("weighted-combinator", null, top - 30 ,left - 60)
-        }
-
-        const addScaleFilterAction = (evt) => {
-            const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("filter", "scale", top - 30 ,left - 60)
-        }
-        const addDynamicScaleFilterAction = (evt) => {
-            const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("filter", "dynamic-scale", top - 30 ,left - 60)
-        }
-        const addBinaryFilterAction = (evt) => {
-            const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("filter", "binary", top - 30 ,left - 60)
+        
+        const nodeAdder = (type: NodeSchemaType, subtype: NodeSchemaSubtype) => {
+            return (evt:MouseEvent) => {
+                const {top, left} = this.getPositionFromEvent(evt)
+                this.props.nodeTreeBuilder.addNode(type, subtype, top - 50 ,left - 100)
+            }
         }
 
         return [
@@ -326,7 +304,7 @@ export class NodeArea extends Component{
                 submenu: [
                     {
                         text: "Source",
-                        action: addSourceAction,
+                        action: nodeAdder("source", "perlin"),
                         submenu: []
                     },
                     {
@@ -335,12 +313,12 @@ export class NodeArea extends Component{
                         submenu: [
                             {
                                 text: "Sum",
-                                action: addCombinatorAction,
+                                action: nodeAdder("combinator", "combinator"),
                                 submenu: []
                             },
                             {
                                 text: "Weighted sum",
-                                action: addWeightedCombinatorAction,
+                                action: nodeAdder("combinator", "weighted-combinator"),
                                 submenu: []
                             }
                         ]
@@ -351,17 +329,17 @@ export class NodeArea extends Component{
                         submenu: [
                             {
                                 text: "Scale",
-                                action: addScaleFilterAction,
+                                action: nodeAdder("filter", "scale"),
                                 submenu: []
                             },
                             {
                                 text: "DynamicScale",
-                                action: addDynamicScaleFilterAction,
+                                action: nodeAdder("filter", "dynamic-scale"),
                                 submenu: []
                             },
                             {
                                 text: "Binary",
-                                action: addBinaryFilterAction,
+                                action: nodeAdder("filter", "binary"),
                                 submenu: []
                             }
                         ]

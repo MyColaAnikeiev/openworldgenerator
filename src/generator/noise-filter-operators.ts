@@ -1,10 +1,10 @@
 import { FilterFactory, FilterParams, NodeParamsUpdateChanges } from "./types";
-import { PerlinNode } from './perlin-node'
+import { GeneratorNode } from './generator-node'
 
 /**
  * Input source, filter function or params could be changed on fly 
  */
-export class PerlinFilter implements PerlinNode{  
+export class NoiseFilter implements GeneratorNode{  
     private filter: (x:number, y:number) => number;
 
     /**
@@ -12,7 +12,7 @@ export class PerlinFilter implements PerlinNode{
      * to it `params` (see factory function description). 
      */
     constructor(
-        private source: PerlinNode, 
+        private source: GeneratorNode, 
         private filterFactory: FilterFactory,
         private params: FilterParams
     )
@@ -25,13 +25,13 @@ export class PerlinFilter implements PerlinNode{
     }
 
     
-    updateSource(source: PerlinNode){
+    updateSource(source: GeneratorNode){
         this.source = source;
         this.filter = this.filterFactory(this.source, this.params);
     }
 
     updateFilter(
-        filterFactory: (node: PerlinNode, params: FilterParams) => ((x: number, y:number) => number),
+        filterFactory: (node: GeneratorNode, params: FilterParams) => ((x: number, y:number) => number),
         params: FilterParams
     ){
         this.filterFactory = filterFactory;
@@ -51,7 +51,7 @@ export class PerlinFilter implements PerlinNode{
 
 
 /**********************
- *  Below are factory function for `PerlinFilter` class
+ *  Below are factory function for `NoiseFilter` class
  */
 
 /**
@@ -59,7 +59,7 @@ export class PerlinFilter implements PerlinNode{
  * Set `scale` to -1.0 to inverse.
  * @param params.scale
  */
-export function PerlinScaleFilterFactory(node: PerlinNode, params : FilterParams){
+export function NoiseScaleFilterFactory(node: GeneratorNode, params : FilterParams){
     const scale = "scale" in params ? params.scale : 1.0;
     const add = "add" in params ? params.add : 0.0;
  
@@ -70,10 +70,10 @@ export function PerlinScaleFilterFactory(node: PerlinNode, params : FilterParams
 
 /**
  * Similar to `ScaleFilter` but instead of constant scale value it uses
- * `PerlinNode` provided by `params.controlNode` 
+ * `GeneratorNode` provided by `params.controlNode` 
  * @param params.controlNode
  */
- export function PerlinDynamicScaleFilterFactory(node: PerlinNode, params : FilterParams){
+ export function NoiseDynamicScaleFilterFactory(node: GeneratorNode, params : FilterParams){
     if("controlNode" in params){
         const control = params.controlNode;
 
@@ -97,7 +97,7 @@ export function PerlinScaleFilterFactory(node: PerlinNode, params : FilterParams
  * 
  * Providing params where `lowerValue` > `upperValue` is alowed.
  */
-export function PerlinBinaryFilterFactory(node: PerlinNode, params : FilterParams){
+export function NoiseBinaryFilterFactory(node: GeneratorNode, params : FilterParams){
     const threshold = "threshold" in params ? params.threshold : 0;
     const lowerValue = "lowerValue" in params ? params.lowerValue : 0;
     const upperValue = "upperValue" in params ? params.upperValue : 1;

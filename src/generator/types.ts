@@ -1,4 +1,4 @@
-import { PerlinNode } from "./perlin-node";
+import { GeneratorNode } from "./generator-node";
 
 export interface NodeParamsUpdateChanges{
     /* Source */
@@ -30,6 +30,6 @@ export type FilterParams = {
     threshold?: number
     upperValue?: number,
     lowerValue?: number
-    controlNode?: PerlinNode
+    controlNode?: GeneratorNode
 }
-export type FilterFactory = (node: PerlinNode, params: FilterParams) => ((x: number, y:number) => number)
+export type FilterFactory = (node: GeneratorNode, params: FilterParams) => ((x: number, y:number) => number)

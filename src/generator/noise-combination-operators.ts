@@ -1,12 +1,12 @@
 import { NodeParamsUpdateChanges } from "./types";
-import { PerlinNode } from './perlin-node'
+import { GeneratorNode } from './generator-node'
 
 /**
- *  Sums up outputs of `PerlinNode` array.
+ *  Sums up outputs of `GeneratorNode` array.
  */
-export class PerlinCombine implements PerlinNode{
+export class NoiseCombine implements GeneratorNode{
 
-    constructor(private sources: PerlinNode[]) {
+    constructor(private sources: GeneratorNode[]) {
     }
 
 
@@ -15,23 +15,23 @@ export class PerlinCombine implements PerlinNode{
     }
 
     getValue(x: number, y: number): number {
-        return this.sources.reduce( (prev: number, node: PerlinNode) => {
+        return this.sources.reduce( (prev: number, node: GeneratorNode) => {
             return prev + node.getValue(x,y);
         }, 0)
     }
 
-    updateSources(sources: PerlinNode[]){
+    updateSources(sources: GeneratorNode[]){
         this.sources = sources;
     }
 
 }
 
 
-export type NodeWeightPair = { node: PerlinNode, weight: number};
+export type NodeWeightPair = { node: GeneratorNode, weight: number};
 /**
- *  Sums up weighted outputs of provided `PerlinNode` array.
+ *  Sums up weighted outputs of provided `GeneratorNode` array.
  */
-export class PerlinCombineWeighted implements PerlinNode{
+export class NoiseCombineWeighted implements GeneratorNode{
     constructor( private sources: NodeWeightPair[] ) 
     {}
 

@@ -1,19 +1,19 @@
 import { filter, map, Observable, startWith, Subject } from "rxjs";
 import { 
     NodeWeightPair, 
-    PerlinCombine, 
-    PerlinCombineWeighted } from "../../generator/perlin-combination-operators";
+    NoiseCombine, 
+    NoiseCombineWeighted } from "../../generator/noise-combination-operators";
 
 import { 
-    PerlinBinaryFilterFactory, 
-    PerlinDynamicScaleFilterFactory, 
-    PerlinFilter, 
-    PerlinScaleFilterFactory } from "../../generator/perlin-filter-operators";
+    NoiseBinaryFilterFactory, 
+    NoiseDynamicScaleFilterFactory, 
+    NoiseFilter, 
+    NoiseScaleFilterFactory } from "../../generator/noise-filter-operators";
 
-import { PerlinNode } from "../../generator/perlin-node"
+import { GeneratorNode } from "../../generator/generator-node"
 import { PerlinNoise } from "../../generator/perlin-noise";
 import { NodeParamsUpdateChanges } from "../../generator/types";
-import { getImageFromPerlinNode } from "./tools";
+import { getImageFromGeneratorNode } from "./tools";
 
 import { 
     CombinatorSchemaProperties, 
@@ -21,8 +21,9 @@ import {
     NodeConnection, 
     NodeSchema, 
     NodeSchemaProperties, 
+    NodeSchemaSubtype, 
     NodeSchemaType,  
-    PerlinFilterType,  
+    NoiseFilterType,  
     SourceSchemaProperties } from "./types"
 
 
@@ -31,7 +32,7 @@ export interface NodeTreeBuilder{
     getNodeSchemas(): NodeSchema[];
     getNodeConnections(): NodeConnection[];
 
-    addNode(type: NodeSchemaType, subtype: PerlinFilterType | null, top: number, left: number): void;
+    addNode(type: NodeSchemaType, subtype: NodeSchemaSubtype, top: number, left: number): void;
     removeNode(id: number): void;
     updateNodeParameters(id: number, changes: NodeParamsUpdateChanges): void;
 
@@ -43,12 +44,12 @@ export interface NodeTreeBuilder{
 }
 
 export interface NodeTreeUser{
-    getNodeInstance(id: number, depth: number): PerlinNode | null;
+    getNodeInstance(id: number, depth: number): GeneratorNode | null;
 }
 
-export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
+export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
-    private nodes: Map<number, PerlinNode> = new Map();
+    private nodes: Map<number, GeneratorNode> = new Map();
 
     // 
     public updated$: Subject<number> = new Subject();
@@ -58,32 +59,30 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
 
     addNode(
-        type: NodeSchemaType, subtype: PerlinFilterType | null,  top: number, left: number
+        type: NodeSchemaType, subtype: NodeSchemaSubtype,  top: number, left: number
     ){
         const maxId = this.getMaxOfSchemaProperty("id");
 
-        let props: NodeSchemaProperties;
+        let props: NodeSchemaProperties = {};
         switch (type){
             case "source":
                 // Make default seeds apear with interval of 16 
-                const maxSeed = Math.ceil((this.getMaxOfSchemaProperty("seed")+1)/16)*16;
+                const maxSeed = Math.ceil((this.getMaxOfSchemaProperty("seed")+1)/8)*8;
                 this.nodeSchemas[0].properties.seed
                 props = { size: 1.0, seed: maxSeed }
                 break;
             case "combinator":
-            case "weighted-combinator":
                 props = { numOfInputs: 2, weights: [1.0, 1.0]};
                 break;
             case "filter":
                 switch(subtype){
                     case "scale":
-                        props = { filterType: "scale",  scale: 1.0, add: 0.0 }
+                        props = { scale: 1.0, add: 0.0 }
                         break;
                     case "dynamic-scale":
-                        props = { filterType: "dynamic-scale" }
                         break;
                     case "binary":
-                        props = { filterType: "binary", threshold: 0.6, lowerValue: 0, upperValue: 1}
+                        props = { threshold: 0.6, lowerValue: 0, upperValue: 1}
                         break;
                 }
                 break;
@@ -93,6 +92,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
         this.nodeSchemas.push({
             id: maxId + 1,
             type,
+            subtype,
             position: {top, left},
             properties: props
         })
@@ -114,7 +114,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
         }
 
         /* Special cases */
-        if(schema.type === "weighted-combinator"){
+        if(schema.subtype === "weighted-combinator"){
 
             if(changes.numOfInputs !== undefined){
                 const prop = schema.properties;
@@ -234,11 +234,11 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
     /**
      * 
-     * @param id `PerlinNode` id.
+     * @param id `GeneratorNode` id.
      * @param scale tells how much pixels (for preview) corespond to one unit of perlin map. 
      * @param width `ImageData` width.
      * @param height `ImageData` height.
-     * @returns `ImageData` that is sampled from specified `PerlinNode`.
+     * @returns `ImageData` that is sampled from specified `GeneratorNode`.
      */
     getPreviewStream(
         id: number, scale:number = 16, width: number = 180, height: number = 120)
@@ -267,7 +267,8 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             map(() => {
                 const node = this.getNodeInstance(id);
                 if(node){
-                    return getImageFromPerlinNode(node, scale, width, height);
+                    debugger
+                    return getImageFromGeneratorNode(node, scale, width, height);
                 }
                 // Return blank if node can't be instantiated.
                 return new ImageData(width, height);
@@ -277,9 +278,9 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
 
     /**
-     * @returns `PerlinNode` instance. In not present, than try to instantiate it from schema. If not posible, returns `null`.
+     * @returns `GeneratorNode` instance. In not present, than try to instantiate it from schema. If not posible, returns `null`.
      */
-    getNodeInstance(id: number): PerlinNode | null{
+    getNodeInstance(id: number): GeneratorNode | null{
         if(this.nodes.has(id)){
             return this.nodes.get(id);
         }
@@ -293,49 +294,45 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             case "source":
                 return this.instantiateSource(schema);
             case "combinator":
-            case "weighted-combinator":
                 return this.instantiateCombinator(schema);
             case "filter":
                 return this.instantiateFilter(schema);
         }
     }
     
-    private instantiateSource(schema: NodeSchema): PerlinNode{
+    private instantiateSource(schema: NodeSchema): GeneratorNode{
         const props = schema.properties as SourceSchemaProperties;
         const instance = new PerlinNoise(props.size, props.seed)
         this.nodes.set(schema.id, instance);
         return instance;
     }
 
-    private instantiateCombinator(schema: NodeSchema): PerlinNode{
+    private instantiateCombinator(schema: NodeSchema): GeneratorNode{
         const inputs = this.getCombinatorInputs(schema);
 
-        let instance: PerlinNode;
-        if(schema.type === "combinator"){
-            instance = new PerlinCombine(<PerlinNode[]>inputs);
+        let instance: GeneratorNode;
+        if(schema.subtype === "combinator"){
+            instance = new NoiseCombine(<GeneratorNode[]>inputs);
         }else{
-            instance = new PerlinCombineWeighted(<NodeWeightPair[]>inputs);
+            instance = new NoiseCombineWeighted(<NodeWeightPair[]>inputs);
         }
 
         this.nodes.set(schema.id, instance);
         return instance;
     }
 
-    private getCombinatorInputs(schema: NodeSchema): PerlinNode[] | NodeWeightPair[]{
+    private getCombinatorInputs(schema: NodeSchema): GeneratorNode[] | NodeWeightPair[]{
         const props = schema.properties as CombinatorSchemaProperties;
 
-        const sources: PerlinNode[] = [];
+        const sources: GeneratorNode[] = [];
         const pairs: NodeWeightPair[] = [];
 
-        this.connections.forEach(conn => {
-            if(conn.targetType === "default" && conn.idTo === schema.id){
-                if(schema.type == 'weighted-combinator' && conn.targetEntryNumber >= props.numOfInputs){
-                    return;
-                }
-
+        this.connections
+            .filter(conn => conn.targetType === "default" && conn.idTo === schema.id)
+            .forEach(conn => {
                 const source = this.getNodeInstance(conn.idFrom);
                 if(source){
-                    if(schema.type === "weighted-combinator"){
+                    if(schema.subtype === "weighted-combinator"){
                         pairs.push({
                             node: source,
                             weight: props.weights[conn.targetEntryNumber]
@@ -344,10 +341,9 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
                         sources.push(source);
                     }
                 }
-            }
         })
 
-        return schema.type === "combinator" ? sources : pairs;
+        return schema.subtype === "combinator" ? sources : pairs;
     }
 
     private instantiateFilter(schema: NodeSchema){
@@ -364,12 +360,12 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             return null;
         }
 
-        const props = schema.properties as FilterSchemaProperties;
-        let instance: PerlinNode;
+        const props = schema.properties
+        let instance: GeneratorNode;
 
-        switch(props.filterType){
+        switch(schema.subtype){
             case "scale":
-                instance = new PerlinFilter(source, PerlinScaleFilterFactory, {
+                instance = new NoiseFilter(source, NoiseScaleFilterFactory, {
                     scale: props.scale,
                     add: props.add
                 })
@@ -384,12 +380,12 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
                 if(!control){
                     return null;
                 }
-                instance = new PerlinFilter(source, PerlinDynamicScaleFilterFactory, {
+                instance = new NoiseFilter(source, NoiseDynamicScaleFilterFactory, {
                     controlNode: control
                 })
                 break;
             case "binary":
-                instance = new PerlinFilter(source, PerlinBinaryFilterFactory, {
+                instance = new NoiseFilter(source, NoiseBinaryFilterFactory, {
                     threshold: props.threshold,
                     lowerValue: props.lowerValue,
                     upperValue: props.upperValue

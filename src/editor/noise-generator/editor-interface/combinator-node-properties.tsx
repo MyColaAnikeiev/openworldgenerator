@@ -33,8 +33,9 @@ export class CombinatorNodeProperties extends Component{
     }
 
     getInputs(){
-        const properties = this.props.schema.properties as CombinatorSchemaProperties;
-        const weighted =  this.props.schema.type === "weighted-combinator";
+        const {schema} = this.props;
+        const properties = schema.properties as CombinatorSchemaProperties;
+        const weighted =  schema.subtype === "weighted-combinator";
 
         const inputs = Array.from(Array(properties.numOfInputs)).map((_, ind: number) => {
             return (

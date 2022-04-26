@@ -1,4 +1,13 @@
-export type NodeSchemaType = 'source' | 'combinator' | 'weighted-combinator' | 'filter';
+export type NodeSchemaType = 'source' | 'combinator' | 'filter';
+
+export type NodeSchemaSubtype = 
+    // Generators    
+        'perlin' |
+    // Combinators
+        'combinator' | 'weighted-combinator' |
+    // Filters
+        "scale" | "dynamic-scale" | "binary";
+ 
 
 export type SourceSchemaProperties = {
     size: number,
@@ -10,23 +19,21 @@ export type CombinatorSchemaProperties = {
     weights?: number[];
 };
 
-export type PerlinFilterType = "scale" | "dynamic-scale" | "binary";
+export type NoiseFilterType = "scale" | "dynamic-scale" | "binary";
 
 export type FilterSchemaProperties = {
-    filterType: PerlinFilterType
     scale?: number,
     add?: number,
-    threshold?: number
+    threshold?: number,
     upperValue?: number,
     lowerValue?: number
 }
 
 export type NodeSchemaProperties = {
     size?: number,
-    seed?: number
-    numOfInputs?: number;
-    weights?: number[];
-    filterType?: PerlinFilterType
+    seed?: number,
+    numOfInputs?: number,
+    weights?: number[],
     scale?: number,
     add?: number,
     threshold?: number
@@ -38,6 +45,7 @@ export interface NodeSchema{
     id: number,
     name?: string
     type: NodeSchemaType,
+    subtype: NodeSchemaSubtype,
     position: {
         top: number,
         left: number

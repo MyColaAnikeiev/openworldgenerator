@@ -1,8 +1,8 @@
-import { PerlinNode } from "../../generator/perlin-node";
+import { GeneratorNode } from "../../generator/generator-node";
 
 
-export function getImageFromPerlinNode(
-    node: PerlinNode, scale: number, width: number, height: number
+export function getImageFromGeneratorNode(
+    node: GeneratorNode, scale: number, width: number, height: number
 ): ImageData{
     const imgData = new ImageData(width, height);
 

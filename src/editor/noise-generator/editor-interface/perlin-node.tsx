@@ -94,10 +94,7 @@ export class PerlinNodeComponent extends Component{
 
     getNodeTitle(): string{
         const {schema} = this.props;
-        if(schema.type === "filter"){
-            return schema.properties.filterType;
-        }
-        return schema.type;
+        return schema.subtype;
     }
 
     getPropertyControls(){
@@ -108,7 +105,6 @@ export class PerlinNodeComponent extends Component{
             case "source":
                 return <SourceNodeProperties schema={schema} outputCallback={outputCallback}/>
             case "combinator":
-            case "weighted-combinator":
                 return (
                     <CombinatorNodeProperties schema={schema} 
                         outputCallback={outputCallback}

@@ -1,5 +1,5 @@
 import { NodeParamsUpdateChanges } from "./types";
-import { PerlinNode } from "./perlin-node";
+import { GeneratorNode } from "./generator-node";
 
 const permutation = [151,160,137,91,90,15,                 // Hash lookup table as defined by Ken Perlin.  This is a randomly
   131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,    // arranged array of all numbers from 0-255 inclusive.
@@ -16,7 +16,7 @@ const permutation = [151,160,137,91,90,15,                 // Hash lookup table 
   138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 ];
 
-export class PerlinNoise implements PerlinNode{
+export class PerlinNoise implements GeneratorNode{
     /**
      * 
      * @param {number} size - number of x or y units that corresponds to

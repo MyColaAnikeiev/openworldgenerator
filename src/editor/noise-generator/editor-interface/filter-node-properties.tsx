@@ -35,7 +35,7 @@ export class FilterNodeProperties extends Component{
     getControls(){
         const {properties} = this.props.schema;
 
-        switch(this.props.schema.properties.filterType){
+        switch(this.props.schema.subtype){
             case "scale":
                 return [
                     (
