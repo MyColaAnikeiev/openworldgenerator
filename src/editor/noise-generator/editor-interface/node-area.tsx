@@ -182,6 +182,8 @@ export class NodeArea extends Component{
 
 
     handleMouseDown(evt: MouseEvent){
+        setTimeout( () =>  this.renderConnections(),0);
+
         if(this.state.contextMenu.on === false){
             return;
         }
@@ -207,7 +209,7 @@ export class NodeArea extends Component{
         }
     }
 
-    renderConnections(evt: MouseEvent){
+    renderConnections(evt?: MouseEvent){
         const connections = this.props.nodeTreeBuilder.getNodeConnections();
         const nodes = this.props.nodeTreeBuilder.getNodeSchemas();
         const ctx = this.bgCanvasRef.getContext("2d");
