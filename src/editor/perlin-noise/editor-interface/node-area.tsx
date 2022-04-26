@@ -4,7 +4,7 @@ import styles from "./node-area.module.scss";
 import { PerlinNodeComponent } from "./perlin-node";
 import { NodeTreeBuilder } from "../perlin-node-tree";
 import { CombinatorSchemaProperties, NodeConnection } from "../types";
-import { NodePropUpdateChanges } from "../../../generator/types";
+import { NodeParamsUpdateChanges } from "../../../generator/types";
 
 
 export class NodeArea extends Component{
@@ -101,8 +101,8 @@ export class NodeArea extends Component{
         return nodeSchemas.map( nodeSchema => {
 
             const menuTrigger = (evt: MouseEvent) => this.handleNodeContextClick(evt, nodeSchema.id);
-            const out = (changes: NodePropUpdateChanges) => { 
-                this.props.nodeTreeBuilder.updateNode(nodeSchema.id, changes);
+            const out = (changes: NodeParamsUpdateChanges) => { 
+                this.props.nodeTreeBuilder.updateNodeParameters(nodeSchema.id, changes);
                 this.setState({});
             }
             const preview$ = this.props.nodeTreeBuilder.getPreviewStream(nodeSchema.id);
@@ -110,16 +110,15 @@ export class NodeArea extends Component{
                 this.connectionDrag.on = true;
                 this.connectionDrag.outputId = nodeSchema.id;
             }
-            const connectionEndCallback = (connType: string, connInd: number) => {
+            const connectionEndCallback = (connType: "default" | "scale-filter.control", connInd: number) => {
                 if(this.connectionDrag.on){
-                    if(connType === "default"){
-                        this.props.nodeTreeBuilder.addConnection({
-                            idFrom: this.connectionDrag.outputId,
-                            idTo: nodeSchema.id,
-                            targetType: "default",
-                            targetEntryNumber: connInd
-                        });
-                    }
+
+                    this.props.nodeTreeBuilder.addConnection({
+                        idFrom: this.connectionDrag.outputId,
+                        idTo: nodeSchema.id,
+                        targetType: connType,
+                        targetEntryNumber: connInd
+                    });
                     this.connectionDrag.on = false;
                 }
             }
@@ -227,26 +226,33 @@ export class NodeArea extends Component{
                     y += 210 + weights * 26;
                     break;
                 case "filter":
-                    throw new Error("Not implemented");
+                    y += 186;
+                    break;
             }
 
             return {x,y};
         }
 
         function getInputPosition(connection: NodeConnection){
-            if(connection.targetType === "default"){
-                const scheme = nodes.find(scheme => scheme.id === connection.idTo);
-                
-                if(scheme.type === "combinator" || scheme.type === "weighted-combinator"){
-                    const props = scheme.properties as CombinatorSchemaProperties;
-                    const connIndex = connection.targetEntryNumber;
-                    const x = scheme.position.left + 2;
-                    const y = scheme.position.top + 210 + connIndex * 26;
-                    return {x,y}
-                }
+            const scheme = nodes.find(scheme => scheme.id === connection.idTo);
+            
+            if(scheme.type === "combinator" || scheme.type === "weighted-combinator"){
+                const props = scheme.properties as CombinatorSchemaProperties;
+                const connIndex = connection.targetEntryNumber;
+                const x = scheme.position.left + 2;
+                const y = scheme.position.top + 210 + connIndex * 26;
+                return {x,y}
             }
 
-            throw new Error("Not implemented");
+            if(scheme.type === "filter"){
+                if(scheme.properties.filterType === "dynamic-scale"){
+                    if(connection.targetType === "scale-filter.control"){
+                        return {x: scheme.position.left, y: scheme.position.top + 182}
+                    }
+                }
+
+                return {x: scheme.position.left, y: scheme.position.top + 158}
+            }
         }
         
         const sizes = this.state.styles.nodeAreaSizes;
@@ -278,17 +284,29 @@ export class NodeArea extends Component{
 
         const addSourceAction = (evt) => {
             const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("source",top - 30 ,left - 60)
+            this.props.nodeTreeBuilder.addNode("source", null, top - 30 ,left - 60)
         }
 
         const addCombinatorAction = (evt) => {
             const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("combinator",top - 30 ,left - 60)
+            this.props.nodeTreeBuilder.addNode("combinator", null, top - 30 ,left - 60)
+        }
+        const addWeightedCombinatorAction = (evt) => {
+            const {top, left} = this.getPositionFromEvent(evt)
+            this.props.nodeTreeBuilder.addNode("weighted-combinator", null, top - 30 ,left - 60)
         }
 
-        const addFilterAction = (evt) => {
+        const addScaleFilterAction = (evt) => {
             const {top, left} = this.getPositionFromEvent(evt)
-            this.props.nodeTreeBuilder.addNode("filter",top - 30 ,left - 60)
+            this.props.nodeTreeBuilder.addNode("filter", "scale", top - 30 ,left - 60)
+        }
+        const addDynamicScaleFilterAction = (evt) => {
+            const {top, left} = this.getPositionFromEvent(evt)
+            this.props.nodeTreeBuilder.addNode("filter", "dynamic-scale", top - 30 ,left - 60)
+        }
+        const addBinaryFilterAction = (evt) => {
+            const {top, left} = this.getPositionFromEvent(evt)
+            this.props.nodeTreeBuilder.addNode("filter", "binary", top - 30 ,left - 60)
         }
 
         return [
@@ -303,16 +321,37 @@ export class NodeArea extends Component{
                     },
                     {
                         text: "Combinator",
-                        action: addCombinatorAction,
-                        submenu: []
+                        action: () => {},
+                        submenu: [
+                            {
+                                text: "Sum",
+                                action: addCombinatorAction,
+                                submenu: []
+                            },
+                            {
+                                text: "Weighted sum",
+                                action: addWeightedCombinatorAction,
+                                submenu: []
+                            }
+                        ]
                     },
                     {
                         text: "Filter",
-                        action: addFilterAction,
+                        action: () => {},
                         submenu: [
                             {
-                                text: "Identity",
-                                action: () => {},
+                                text: "Scale",
+                                action: addScaleFilterAction,
+                                submenu: []
+                            },
+                            {
+                                text: "DynamicScale",
+                                action: addDynamicScaleFilterAction,
+                                submenu: []
+                            },
+                            {
+                                text: "Binary",
+                                action: addBinaryFilterAction,
                                 submenu: []
                             }
                         ]
