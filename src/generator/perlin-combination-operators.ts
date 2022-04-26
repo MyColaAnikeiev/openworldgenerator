@@ -1,4 +1,4 @@
-import { NodePropUpdateChanges } from "./types";
+import { NodeParamsUpdateChanges } from "./types";
 import { PerlinNode } from './perlin-node'
 
 /**
@@ -9,7 +9,9 @@ export class PerlinCombine implements PerlinNode{
     constructor(private sources: PerlinNode[]) {
     }
 
-    updateProperties(props: {[key: string]: number}){
+
+    updateParameters(props: NodeParamsUpdateChanges){
+        /* This node don't take any params. */
     }
 
     getValue(x: number, y: number): number {
@@ -43,8 +45,7 @@ export class PerlinCombineWeighted implements PerlinNode{
         this.sources = sources;
     }
 
-    updateProperties(props: NodePropUpdateChanges){
-        debugger
+    updateParameters(props: NodeParamsUpdateChanges){
         if(props.weight !== undefined){
             if(this.sources.length > props.weight.index){
                 this.sources[props.weight.index].weight = props.weight.value;

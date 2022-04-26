@@ -1,4 +1,4 @@
-import { NodePropUpdateChanges } from "./types";
+import { NodeParamsUpdateChanges } from "./types";
 import { PerlinNode } from './perlin-node'
 
 /* Type declarations */
@@ -53,14 +53,10 @@ export class PerlinFilter implements PerlinNode{
 
     /**
      * Unspecified parameters will preserve it's previous values.
-     */
-    updateParams(params: FilterParams){
+     */   
+    updateParameters(params: NodeParamsUpdateChanges){
         this.params = Object.assign({}, this.params, params);
-        this.filter = this.filterFactory(this.source, params);
-    }
-
-    
-    updateProperties(props: NodePropUpdateChanges){
+        this.filter = this.filterFactory(this.source, this.params);
     }
 }
 

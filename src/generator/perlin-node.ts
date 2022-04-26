@@ -1,4 +1,4 @@
-import { NodePropUpdateChanges } from "./types";
+import { NodeParamsUpdateChanges } from "./types";
 
 /**
  * Provide a common interface for tree like structure of perlin noise sources,
@@ -12,5 +12,5 @@ import { NodePropUpdateChanges } from "./types";
      * 
      * @param props provides parameters for different `PerlinNode`s. Parameters that are unsupported by given `PerlinNode` type will be ignored.
      */
-    abstract updateProperties(props: NodePropUpdateChanges): void;
+    abstract updateParameters(props: NodeParamsUpdateChanges): void;
 }
