@@ -132,7 +132,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
             }
         }
 
-        // My need to rebuild
+        // May need to rebuild
         if(changes.numOfInputs !== undefined){
             this.updateNodeConnections(id);
         }
@@ -141,6 +141,7 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
     }
 
     updateNodeConnections(id: number){
+        debugger
         const schema = this.nodeSchemas.find(schema => schema.id === id);
 
         this.nodes.delete(id);
@@ -369,7 +370,8 @@ export class PerlinNodeTree implements NodeTreeBuilder, NodeTreeUser {
         switch(props.filterType){
             case "scale":
                 instance = new PerlinFilter(source, PerlinScaleFilterFactory, {
-                    scale: props.scale
+                    scale: props.scale,
+                    add: props.add
                 })
                 break;
             case "dynamic-scale":
