@@ -27,16 +27,20 @@ export class NoiseCombine implements GeneratorNode{
 }
 
 
-export type NodeWeightPair = { node: GeneratorNode, weight: number};
+export type NodeWeightPair = { node: GeneratorNode | null, weight: number};
 /**
  *  Sums up weighted outputs of provided `GeneratorNode` array.
  */
 export class NoiseCombineWeighted implements GeneratorNode{
+    private usedInputs: NodeWeightPair[];
+
     constructor( private sources: NodeWeightPair[] ) 
-    {}
+    {
+        this.usedInputs = sources.filter(source => source.node);
+    }
 
     getValue(x: number, y: number): number {
-        return this.sources.reduce((prev: number, pair: NodeWeightPair) => {
+        return this.usedInputs.reduce((prev: number, pair: NodeWeightPair) => {
             return prev + pair.node.getValue(x,y) * pair.weight;
         }, 0)
     }
@@ -49,6 +53,7 @@ export class NoiseCombineWeighted implements GeneratorNode{
         if(props.weight !== undefined){
             if(this.sources.length > props.weight.index){
                 this.sources[props.weight.index].weight = props.weight.value;
+                this.usedInputs = this.sources.filter(source => source.node);
             }
         }
     }

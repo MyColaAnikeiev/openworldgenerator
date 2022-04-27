@@ -16,14 +16,12 @@ import { NodeParamsUpdateChanges } from "../../generator/types";
 import { getImageFromGeneratorNode } from "./tools";
 
 import { 
-    CombinatorSchemaProperties, 
-    FilterSchemaProperties, 
+    CombinatorSchemaProperties,  
     NodeConnection, 
     NodeSchema, 
     NodeSchemaProperties, 
     NodeSchemaSubtype, 
-    NodeSchemaType,  
-    NoiseFilterType,  
+    NodeSchemaType,    
     SourceSchemaProperties } from "./types"
 
 
@@ -45,13 +43,14 @@ export interface NodeTreeBuilder{
 
 export interface NodeTreeUser{
     getNodeInstance(id: number, depth: number): GeneratorNode | null;
+    getNodeSchemas(): NodeSchema[];
+    getNodeConnections(): NodeConnection[];
 }
 
 export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
     private nodes: Map<number, GeneratorNode> = new Map();
 
-    // 
     public updated$: Subject<number> = new Subject();
 
     constructor(private nodeSchemas: NodeSchema[], private connections: NodeConnection[]){
@@ -326,7 +325,10 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
         const props = schema.properties as CombinatorSchemaProperties;
 
         const sources: GeneratorNode[] = [];
-        const pairs: NodeWeightPair[] = [];
+        let pairs: NodeWeightPair[];
+        if(props.weights){
+            pairs = props.weights.map(w => ({ node: null, weight: w }));
+        }
 
         this.connections
             .filter(conn => conn.targetType === "default" && conn.idTo === schema.id)
@@ -334,10 +336,7 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
                 const source = this.getNodeInstance(conn.idFrom);
                 if(source){
                     if(schema.subtype === "weighted-combinator"){
-                        pairs.push({
-                            node: source,
-                            weight: props.weights[conn.targetEntryNumber]
-                        })
+                        pairs[conn.targetEntryNumber].node = source;
                     }else{
                         sources.push(source);
                     }
