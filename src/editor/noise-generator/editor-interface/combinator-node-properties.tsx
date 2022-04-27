@@ -7,6 +7,7 @@ export class CombinatorNodeProperties extends Component{
     
     props: { 
         schema: NodeSchema,
+        selectionMode: boolean,
         outputCallback: (out: NodeParamsUpdateChanges) => void,
         connectionEndCallback: (connType: string, connInd: number) => void
     }
@@ -63,6 +64,10 @@ export class CombinatorNodeProperties extends Component{
 
 
     handleInput(evt: FormEvent, connectionIndex?: number){
+        if(this.props.selectionMode){
+            return;
+        }
+
         const elm = evt.target as HTMLInputElement;
 
         if(elm.name === "weight"){

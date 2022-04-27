@@ -8,6 +8,7 @@ export class SourceNodeProperties extends Component{
 
     props: { 
         schema: NodeSchema,
+        selectionMode: boolean,
         outputCallback: (out: NodeParamsUpdateChanges) => void,
     }
 
@@ -40,6 +41,10 @@ export class SourceNodeProperties extends Component{
     }
 
     handleInput(evt: InputEvent){
+        if(this.props.selectionMode){
+            return;
+        }
+
         const elm = evt.target as HTMLInputElement;
         this.props.outputCallback({ [elm.name] : elm.value });
     }

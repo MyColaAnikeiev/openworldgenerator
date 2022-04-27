@@ -7,6 +7,7 @@ export class FilterNodeProperties extends Component{
     
     props: { 
         schema: NodeSchema,
+        selectionMode: boolean,
         outputCallback: (out: NodeParamsUpdateChanges) => void,
         connectionEndCallback: (connType: string, connInd: number) => void
     }
@@ -115,6 +116,10 @@ export class FilterNodeProperties extends Component{
 
 
     handleInput(evt: FormEvent){
+        if(this.props.selectionMode){
+            return;
+        }
+
         const elm = evt.target as HTMLInputElement;
         
         if(elm.name === "scale"){

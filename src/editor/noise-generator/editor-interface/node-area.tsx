@@ -1,7 +1,7 @@
 import { Component, MouseEvent } from "react";
 import { ContextMenu, MenuEntry } from "./context.menu";
 import styles from "./node-area.module.scss";
-import { PerlinNodeComponent } from "./perlin-node";
+import { GeneratorNodeComponent } from "./perlin-node";
 import { NodeTreeBuilder } from "../perlin-node-tree";
 import { NodeSchemaSubtype, NodeSchemaType } from "../types";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
@@ -12,6 +12,8 @@ export class NodeArea extends Component{
 
     props: {
         nodeTreeBuilder: NodeTreeBuilder,
+        selectionMode: boolean,
+        selectionCallback?: (id: number) => void
     }
 
     state: {
@@ -29,7 +31,7 @@ export class NodeArea extends Component{
         connectionDrag:{
             on: false,
             outputId: number
-        } 
+        }
     }
 
     connectionsRenderCallback!: (evt: MouseEvent | null) => void;
@@ -124,11 +126,14 @@ export class NodeArea extends Component{
             }
 
             const preview$ = this.props.nodeTreeBuilder.getPreviewStream(nodeSchema.id);
+            const selectionCallback = this.getNodeSelectionCallback(nodeSchema.id);
 
             return (
-                <PerlinNodeComponent 
+                <GeneratorNodeComponent 
                     key={nodeSchema.id.toString()} 
-                    schema={nodeSchema} 
+                    schema={nodeSchema}
+                    selectionMode={this.props.selectionMode}
+                    selectionCallback={selectionCallback}
                     contextMenuTrigger={menuTrigger}
                     outputCallback={out}
                     connectionStartCallback={connectionStartCallback}
@@ -173,6 +178,10 @@ export class NodeArea extends Component{
     handleContextClick(evt: MouseEvent): void{
         evt.preventDefault();
 
+        if(this.props.selectionMode){
+            return;
+        }
+
         this.setState({ 
             contextMenu: { 
                 on: true,
@@ -185,8 +194,20 @@ export class NodeArea extends Component{
     }
 
 
+    getNodeSelectionCallback(id: number){
+        return () => {
+            if(this.props.selectionMode && this.props.selectionCallback){
+                this.props.selectionCallback(id);
+            }
+        }
+    }
+
     handleNodeContextClick(evt: MouseEvent, nodeId: number){
         evt.preventDefault();
+
+        if(this.props.selectionMode){
+            return;
+        }
         
         const menu: MenuEntry[] = [
             {

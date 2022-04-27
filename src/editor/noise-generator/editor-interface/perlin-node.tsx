@@ -7,7 +7,7 @@ import { FilterNodeProperties } from "./filter-node-properties";
 import styles from './perlin-node.module.scss';
 import { SourceNodeProperties } from "./source-node-properties";
 
-export class PerlinNodeComponent extends Component{
+export class GeneratorNodeComponent extends Component{
 
     unsubscriber$: Subject<void> = new Subject();
 
@@ -15,11 +15,13 @@ export class PerlinNodeComponent extends Component{
     
     props: { 
         schema: NodeSchema,
+        selectionMode: boolean,
         contextMenuTrigger: (evt: MouseEvent) => void,
         outputCallback: (out: NodeParamsUpdateChanges) => void,
-        connectionStartCallback: () => void;
-        connectionEndCallback: (connType: string, connIndex: number) => void;
-        preview$: Observable<ImageData>;
+        connectionStartCallback: () => void,
+        connectionEndCallback: (connType: string, connIndex: number) => void,
+        selectionCallback: () => void,
+        preview$: Observable<ImageData>
     }
 
     state: {
@@ -58,6 +60,7 @@ export class PerlinNodeComponent extends Component{
                 key={this.props.schema.id.toString()}
                 className={styles.node + ' ' + styles['source-node']}
                 style={inineStyle}
+                onClick={this.handleNodeClick.bind(this)}
                 onContextMenu={(evt: MouseEvent) => evt.stopPropagation()}
             >
                 <div 
@@ -100,20 +103,29 @@ export class PerlinNodeComponent extends Component{
     getPropertyControls(){
         const {schema} = this.props;
         const {outputCallback} = this.props;
+        const {selectionMode} = this.props; 
 
         switch(schema.type){
             case "source":
-                return <SourceNodeProperties schema={schema} outputCallback={outputCallback}/>
+                return (
+                    <SourceNodeProperties 
+                        schema={schema} 
+                        selectionMode={selectionMode} 
+                        outputCallback={outputCallback}
+                    />
+                )
             case "combinator":
                 return (
                     <CombinatorNodeProperties schema={schema} 
+                        selectionMode={selectionMode}
                         outputCallback={outputCallback}
                         connectionEndCallback={this.props.connectionEndCallback}
                     />
                 )
             case "filter":
                 return (
-                    <FilterNodeProperties schema={schema} 
+                    <FilterNodeProperties schema={schema}
+                        selectionMode={selectionMode} 
                         outputCallback={outputCallback}
                         connectionEndCallback={this.props.connectionEndCallback}
                     />
@@ -122,8 +134,17 @@ export class PerlinNodeComponent extends Component{
 
     }
 
+    handleNodeClick(){
+        if(this.props.selectionMode){
+            this.props.selectionCallback();
+        }
+    }
 
     handleMousedown(evt: MouseEvent){
+        if(this.props.selectionMode){
+            return;
+        }
+
         this.dragStart(evt);
     }
     handleMousemove(evt: MouseEvent){
@@ -138,11 +159,21 @@ export class PerlinNodeComponent extends Component{
     handleContextMenu(evt: MouseEvent){
         evt.preventDefault();
         evt.stopPropagation();
+
+        if(this.props.selectionMode){
+            return;
+        }
+
         this.props.contextMenuTrigger(evt);
     }
     handleOutputConnectionStart(evt: MouseEvent){
+        if(this.props.selectionMode){
+            return;
+        }
+
         this.props.connectionStartCallback();
     }
+
 
     dragStart(evt: MouseEvent){
         if(evt.button != 0){
