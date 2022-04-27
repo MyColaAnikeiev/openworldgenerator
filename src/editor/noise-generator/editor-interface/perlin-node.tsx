@@ -61,11 +61,11 @@ export class PerlinNodeComponent extends Component{
                 onContextMenu={(evt: MouseEvent) => evt.stopPropagation()}
             >
                 <div 
-                    onMouseDown={this.dragStart.bind(this)}
-                    onMouseMove={this.drag.bind(this)}
-                    onMouseUp={this.dragOver.bind(this)}
-                    onMouseLeave={this.dragOver.bind(this)}
-                    onContextMenu={this.contextMenu.bind(this)}
+                    onMouseDown={this.handleMousedown.bind(this)}
+                    onMouseMove={this.handleMousemove.bind(this)}
+                    onMouseUp={this.handleMouseup.bind(this)}
+                    onMouseLeave={this.handleMouseleve.bind(this)}
+                    onContextMenu={this.handleContextMenu.bind(this)}
                 >
                     <div className={styles.head}>
                         <span>{this.getNodeTitle()}</span>
@@ -84,7 +84,7 @@ export class PerlinNodeComponent extends Component{
 
                     <div 
                         className={styles.hook} 
-                        onMouseDown={() => this.props.connectionStartCallback()}
+                        onMouseDown={this.handleOutputConnectionStart.bind(this)}
                     >
                     </div>
                 </div>
@@ -122,15 +122,26 @@ export class PerlinNodeComponent extends Component{
 
     }
 
-    handleInput(evt: InputEvent){
-        const elm = evt.target as HTMLInputElement;
-        this.props.outputCallback({ [elm.name] : elm.value });
-    }
 
-    contextMenu(evt: MouseEvent){
+    handleMousedown(evt: MouseEvent){
+        this.dragStart(evt);
+    }
+    handleMousemove(evt: MouseEvent){
+        this.drag(evt);
+    }
+    handleMouseup(evt:MouseEvent){
+        this.dragOver();
+    }
+    handleMouseleve(evt: MouseEvent){
+        this.dragOver();
+    }
+    handleContextMenu(evt: MouseEvent){
         evt.preventDefault();
         evt.stopPropagation();
         this.props.contextMenuTrigger(evt);
+    }
+    handleOutputConnectionStart(evt: MouseEvent){
+        this.props.connectionStartCallback();
     }
 
     dragStart(evt: MouseEvent){
@@ -138,6 +149,7 @@ export class PerlinNodeComponent extends Component{
             return;
         }
 
+        /* Start dragging */
         this.setState({
             drag: {
                 on: true,
@@ -146,7 +158,6 @@ export class PerlinNodeComponent extends Component{
             }
         })
     }
-
     drag(evt: MouseEvent){
         if(this.state.drag.on === false){
             return;
@@ -166,7 +177,6 @@ export class PerlinNodeComponent extends Component{
         })
 
     }
-
     dragOver(){
         this.setState({
             drag: {

@@ -7,14 +7,6 @@
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */
 
-    &-bg-canvas{
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-    }
-
     &-holder{
         position: absolute;
         width: 100%;
