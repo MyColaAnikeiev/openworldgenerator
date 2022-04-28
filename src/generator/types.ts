@@ -22,14 +22,28 @@ export interface NodeParamsUpdateChanges{
     threshold?: number;
     upperValue?: number;
     lowerValue?: number;
+
+    // Limiter
+    maxValue?: number,
+    minValue?: number
 }
 
 export type FilterParams = { 
+    // Scale filter
     scale?: number,
     add?: number,
+
+    // Binary filter
     threshold?: number
     upperValue?: number,
     lowerValue?: number
+
+    // Dynamic scale
     controlNode?: GeneratorNode
+    
+    // Limiter
+    maxValue?: number,
+    minValue?: number
 }
+
 export type FilterFactory = (node: GeneratorNode, params: FilterParams) => ((x: number, y:number) => number)

@@ -111,6 +111,32 @@ export class FilterNodeProperties extends Component{
                         </div>
                     )
                 ]
+            case "limit":
+            case "smooth-limit":
+                return [
+                    (
+                        <div key="maxValue" className={styles.row}>
+                            <label>max:</label>
+                            <input
+                                name="maxValue"
+                                type="number" step="0.1"
+                                onInput={(evt: FormEvent) => this.handleInput(evt)}
+                                value={properties.maxValue}
+                            />
+                        </div>
+                    ),
+                    (
+                        <div key="minValue" className={styles.row}>
+                            <label>min:</label>
+                            <input
+                                name="minValue"
+                                type="number" step="0.1"
+                                onInput={(evt: FormEvent) => this.handleInput(evt)}
+                                value={properties.minValue}
+                            />
+                        </div>
+                    )
+                ]
         }
     }
 
@@ -138,7 +164,13 @@ export class FilterNodeProperties extends Component{
         if(elm.name === "lowerValue"){
             this.props.outputCallback({ lowerValue: parseFloat(elm.value)})
         }
-    }
 
+        if(elm.name === "maxValue"){
+            this.props.outputCallback({ maxValue: parseFloat(elm.value)})
+        }
+        if(elm.name === "minValue"){
+            this.props.outputCallback({ minValue: parseFloat(elm.value)})
+        }
+    }
 
 }

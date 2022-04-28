@@ -6,7 +6,7 @@ export type NodeSchemaSubtype =
     // Combinators
         'combinator' | 'weighted-combinator' |
     // Filters
-        "scale" | "dynamic-scale" | "binary";
+        "scale" | "dynamic-scale" | "binary" | "limit" | "smooth-limit";
  
 
 export type SourceSchemaProperties = {
@@ -38,7 +38,9 @@ export type NodeSchemaProperties = {
     add?: number,
     threshold?: number
     upperValue?: number,
-    lowerValue?: number
+    lowerValue?: number,
+    maxValue?: number,
+    minValue?: number
 }
 
 export interface NodeSchema{ 

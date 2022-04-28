@@ -60,8 +60,8 @@ export class NoiseFilter implements GeneratorNode{
  * @param params.scale
  */
 export function NoiseScaleFilterFactory(node: GeneratorNode, params : FilterParams){
-    const scale = "scale" in params ? params.scale : 1.0;
-    const add = "add" in params ? params.add : 0.0;
+    const scale = params.scale !== undefined ? params.scale : 1.0;
+    const add = params.add !== undefined ? params.add : 0.0;
  
     return function(x: number, y: number){
         return node.getValue(x,y) * scale + add;
@@ -74,7 +74,7 @@ export function NoiseScaleFilterFactory(node: GeneratorNode, params : FilterPara
  * @param params.controlNode
  */
  export function NoiseDynamicScaleFilterFactory(node: GeneratorNode, params : FilterParams){
-    if("controlNode" in params){
+    if(params.controlNode !== undefined){
         const control = params.controlNode;
 
         return function(x: number, y: number){
@@ -98,12 +98,40 @@ export function NoiseScaleFilterFactory(node: GeneratorNode, params : FilterPara
  * Providing params where `lowerValue` > `upperValue` is alowed.
  */
 export function NoiseBinaryFilterFactory(node: GeneratorNode, params : FilterParams){
-    const threshold = "threshold" in params ? params.threshold : 0;
-    const lowerValue = "lowerValue" in params ? params.lowerValue : 0;
-    const upperValue = "upperValue" in params ? params.upperValue : 1;
+    const threshold = params.threshold !== undefined ? params.threshold : 0;
+    const lowerValue = params.lowerValue !== undefined ? params.lowerValue : 0;
+    const upperValue = params.upperValue !== undefined ? params.upperValue : 1;
 
     return function(x: number, y: number){
         return node.getValue(x,y) < threshold ? lowerValue : upperValue;
     }
 }
 
+export function NoiseLimiterFilterFactory(node: GeneratorNode, params: FilterParams){
+    const maxValue = params.maxValue !== undefined ? params.maxValue : 1.0;
+    const minValue = params.minValue !== undefined ? params.minValue : -1.0;
+
+    return function(x: number, y: number){
+        let val = node.getValue(x,y);
+        if(val > maxValue){
+            val = maxValue;
+        }
+        if(val < minValue){
+            val = minValue;
+        }
+        return val;
+    }
+}
+
+export function NoiseSmoothLimiterFilterFactory(node: GeneratorNode, params: FilterParams){
+    const maxValue = params.maxValue !== undefined ? params.maxValue : 1.0;
+    const minValue = params.minValue !== undefined ? params.minValue : -1.0;
+    const midValue = (maxValue + minValue) / 2.0;
+    const half = maxValue - midValue;
+
+    return function(x: number, y: number){
+        let val = node.getValue(x,y) - midValue;
+        val = half * (val*val) / (0.3 * half + val*val) * Math.sign(val) + midValue;
+        return val;
+    }
+}

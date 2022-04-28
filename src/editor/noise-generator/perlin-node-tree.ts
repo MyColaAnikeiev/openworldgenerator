@@ -8,7 +8,9 @@ import {
     NoiseBinaryFilterFactory, 
     NoiseDynamicScaleFilterFactory, 
     NoiseFilter, 
-    NoiseScaleFilterFactory } from "../../generator/noise-filter-operators";
+    NoiseLimiterFilterFactory, 
+    NoiseScaleFilterFactory, 
+    NoiseSmoothLimiterFilterFactory} from "../../generator/noise-filter-operators";
 
 import { GeneratorNode } from "../../generator/generator-node"
 import { PerlinNoise } from "../../generator/perlin-noise";
@@ -82,6 +84,10 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
                     case "binary":
                         props = { threshold: 0.6, lowerValue: 0, upperValue: 1}
                         break;
+                    case "limit":
+                    case "smooth-limit":
+                        props = { maxValue: 1.0 , minValue: -1.0 };
+                        break
                 }
                 break;
         }
@@ -389,6 +395,18 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
                     threshold: props.threshold,
                     lowerValue: props.lowerValue,
                     upperValue: props.upperValue
+                })
+                break;
+            case "limit":
+                instance = new NoiseFilter(source,NoiseLimiterFilterFactory, {
+                    maxValue: props.maxValue,
+                    minValue: props.minValue
+                })
+                break;
+            case "smooth-limit":
+                instance = new NoiseFilter(source,NoiseSmoothLimiterFilterFactory, {
+                    maxValue: props.maxValue,
+                    minValue: props.minValue
                 })
                 break;
         }

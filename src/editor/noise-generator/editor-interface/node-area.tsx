@@ -170,9 +170,13 @@ export class NodeArea extends Component{
     }
 
     handleMouseup(evt: MouseEvent){
-        this.setState({ connectionDrag : {
-            on: false, outputId: 0}
-        })
+        if(this.state.connectionDrag.on){
+            this.setState({ connectionDrag : {
+                on: false, outputId: 0}
+            })
+
+            setTimeout(() => this.connectionsRenderCallback(evt), 0);
+        }
     }
 
     handleContextClick(evt: MouseEvent): void{
@@ -281,6 +285,16 @@ export class NodeArea extends Component{
                             {
                                 text: "Binary",
                                 action: nodeAdder("filter", "binary"),
+                                submenu: []
+                            },
+                            {
+                                text: "Limit",
+                                action: nodeAdder("filter", "limit"),
+                                submenu: []
+                            },
+                            {
+                                text: "Smooth limit",
+                                action: nodeAdder("filter", "smooth-limit"),
                                 submenu: []
                             }
                         ]
