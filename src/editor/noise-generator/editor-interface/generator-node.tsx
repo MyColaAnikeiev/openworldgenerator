@@ -4,7 +4,7 @@ import { NodeParamsUpdateChanges } from "../../../generator/types";
 import { NodeSchema, SourceSchemaProperties } from "../types"
 import { CombinatorNodeProperties } from "./combinator-node-properties";
 import { FilterNodeProperties } from "./filter-node-properties";
-import styles from './perlin-node.module.scss';
+import styles from './generator-node.module.scss';
 import { SourceNodeProperties } from "./source-node-properties";
 
 export class GeneratorNodeComponent extends Component{

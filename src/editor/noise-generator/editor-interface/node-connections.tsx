@@ -1,5 +1,5 @@
 import { Component, MouseEvent } from "react";
-import { NodeTreeBuilder } from "../perlin-node-tree";
+import { NodeTreeBuilder } from "../node-tree-generator";
 import { NodeConnection } from "../types";
 import styles from "./node-connections.module.scss";
 

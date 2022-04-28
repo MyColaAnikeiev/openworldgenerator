@@ -1,8 +1,8 @@
 import { Component, MouseEvent } from "react";
 import { ContextMenu, MenuEntry } from "./context.menu";
 import styles from "./node-area.module.scss";
-import { GeneratorNodeComponent } from "./perlin-node";
-import { NodeTreeBuilder } from "../perlin-node-tree";
+import { GeneratorNodeComponent } from "./generator-node";
+import { NodeTreeBuilder } from "../node-tree-generator";
 import { NodeSchemaSubtype, NodeSchemaType } from "../types";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
 import { NodeConnectionsComponent } from "./node-connections";
