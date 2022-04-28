@@ -19,6 +19,7 @@ import { getImageFromGeneratorNode } from "./tools";
 
 import { 
     CombinatorSchemaProperties,  
+    ConnectionTargetType,  
     NodeConnection, 
     NodeSchema, 
     NodeSchemaProperties, 
@@ -37,6 +38,7 @@ export interface NodeTreeBuilder{
     updateNodeParameters(id: number, changes: NodeParamsUpdateChanges): void;
 
     addConnection(conn: NodeConnection): void;
+    removeConnection(idTo: number, type: ConnectionTargetType, entryNumber?: number): void;
 
     getPreviewStream(
         id: number, scale?:number, width?: number, height?: number)
@@ -206,6 +208,13 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
             this.updateNodeConnections(conn.idTo);
             this.updated$.next(conn.idTo);
         }
+    }
+
+    removeConnection(idTo: number, type: ConnectionTargetType, entryNumber?: number){
+        this.connections = this.connections.filter(conn => 
+            { return conn.idTo !== idTo || conn.targetType !== type || conn.targetEntryNumber !== entryNumber })
+
+        this.updateNodeConnections(idTo);
     }
 
     /**

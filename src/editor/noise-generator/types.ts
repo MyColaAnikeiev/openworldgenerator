@@ -55,11 +55,11 @@ export interface NodeSchema{
     properties: NodeSchemaProperties
 }
 
+export type ConnectionTargetType = "default" | "scale-filter.control";
 
 export type NodeConnection = {
     idTo: number,
     idFrom: number,
-    targetType: "default" | "scale-filter.control",
-    // 
+    targetType: ConnectionTargetType,
     targetEntryNumber?: number
 }
