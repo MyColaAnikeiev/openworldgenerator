@@ -1,6 +1,6 @@
-import { Component, FormEvent } from "react";
+import { Component, FormEvent, MouseEvent } from "react";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
-import { CombinatorSchemaProperties, NodeSchema } from "../types";
+import { CombinatorSchemaProperties, ConnectionTargetType, NodeSchema } from "../types";
 import styles from "./combinator-node-properties.module.scss";
 
 export class CombinatorNodeProperties extends Component{
@@ -9,7 +9,8 @@ export class CombinatorNodeProperties extends Component{
         schema: NodeSchema,
         selectionMode: boolean,
         outputCallback: (out: NodeParamsUpdateChanges) => void,
-        connectionEndCallback: (connType: string, connInd: number) => void
+        connectionEndCallback: (connType: string, connInd: number) => void,
+        connectionRemoveCallback: (connType: ConnectionTargetType, connIndex?: number) => void
     }
 
     render(){
@@ -39,11 +40,18 @@ export class CombinatorNodeProperties extends Component{
         const weighted =  schema.subtype === "weighted-combinator";
 
         const inputs = Array.from(Array(properties.numOfInputs)).map((_, ind: number) => {
+            const handleInputHookContextClick = (evt: MouseEvent) => {
+                evt.preventDefault();
+                evt.stopPropagation();
+                this.props.connectionRemoveCallback("default",ind)
+            }
+
             return (
                 <div key={ind.toString()} className={styles.row}>
                     <div 
                         className={styles['input-hook']}
                         onMouseUp={() => this.props.connectionEndCallback("default", ind)}
+                        onContextMenu={handleInputHookContextClick}
                     ></div>
                     { weighted ?
                      <input

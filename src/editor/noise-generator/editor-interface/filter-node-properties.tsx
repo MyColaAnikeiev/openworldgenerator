@@ -1,6 +1,6 @@
-import { Component, FormEvent } from "react";
+import { Component, FormEvent, MouseEvent } from "react";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
-import { FilterSchemaProperties, NodeSchema } from "../types";
+import { ConnectionTargetType, FilterSchemaProperties, NodeSchema } from "../types";
 import styles from "./filter-node-properties.module.scss";
 
 export class FilterNodeProperties extends Component{
@@ -9,11 +9,19 @@ export class FilterNodeProperties extends Component{
         schema: NodeSchema,
         selectionMode: boolean,
         outputCallback: (out: NodeParamsUpdateChanges) => void,
-        connectionEndCallback: (connType: string, connInd: number) => void
+        connectionEndCallback: (connType: string, connInd: number) => void,
+        connectionRemoveCallback: (connType: ConnectionTargetType, connIndex?: number) => void
     }
 
     render(){
         const properties = this.props.schema.properties as FilterSchemaProperties;
+
+        const handleInputHookContextClick = (evt: MouseEvent) => {
+            debugger
+            evt.preventDefault();
+            evt.stopPropagation();
+            this.props.connectionRemoveCallback("default");
+        }
 
         return (
             <div className={styles.properties}>
@@ -21,6 +29,7 @@ export class FilterNodeProperties extends Component{
                     <div 
                         className={styles['input-hook']}
                         onMouseUp={() => this.props.connectionEndCallback("default", 0)}
+                        onContextMenu={handleInputHookContextClick}
                     ></div>
                     <label className={styles['input-label']}>
                         Input
@@ -34,7 +43,14 @@ export class FilterNodeProperties extends Component{
     }
 
     getControls(){
-        const {properties} = this.props.schema;
+        const {schema} = this.props;
+        const {properties} = schema;
+
+        const removeDynamicScaleInput = (evt: MouseEvent) => {
+            evt.preventDefault();
+            evt.stopPropagation();
+            this.props.connectionRemoveCallback("scale-filter.control");
+        }
 
         switch(this.props.schema.subtype){
             case "scale":
@@ -69,6 +85,7 @@ export class FilterNodeProperties extends Component{
                             <div 
                                 className={styles['input-hook']}
                                 onMouseUp={() => this.props.connectionEndCallback("scale-filter.control", 0)}
+                                onContextMenu={removeDynamicScaleInput}
                             ></div>
                             <label className={styles['input-label']}>
                                 Input

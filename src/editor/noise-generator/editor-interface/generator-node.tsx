@@ -1,7 +1,7 @@
-import { Component, MouseEvent } from "react"
+import { Component, MouseEvent, MouseEventHandler } from "react"
 import { delay, Observable, Subject, takeUntil } from "rxjs";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
-import { NodeSchema, SourceSchemaProperties } from "../types"
+import { ConnectionTargetType, NodeSchema, SourceSchemaProperties } from "../types"
 import { CombinatorNodeProperties } from "./combinator-node-properties";
 import { FilterNodeProperties } from "./filter-node-properties";
 import styles from './generator-node.module.scss';
@@ -19,7 +19,8 @@ export class GeneratorNodeComponent extends Component{
         contextMenuTrigger: (evt: MouseEvent) => void,
         outputCallback: (out: NodeParamsUpdateChanges) => void,
         connectionStartCallback: () => void,
-        connectionEndCallback: (connType: string, connIndex: number) => void,
+        connectionEndCallback: (connType: ConnectionTargetType, connIndex: number) => void,
+        connectionRemoveCallback: (connType: ConnectionTargetType, connIndex?: number) => void,
         selectionCallback: () => void,
         preview$: Observable<ImageData>
     }
@@ -130,6 +131,7 @@ export class GeneratorNodeComponent extends Component{
                         selectionMode={selectionMode}
                         outputCallback={outputCallback}
                         connectionEndCallback={this.props.connectionEndCallback}
+                        connectionRemoveCallback={this.props.connectionRemoveCallback}
                     />
                 )
             case "filter":
@@ -138,6 +140,7 @@ export class GeneratorNodeComponent extends Component{
                         selectionMode={selectionMode} 
                         outputCallback={outputCallback}
                         connectionEndCallback={this.props.connectionEndCallback}
+                        connectionRemoveCallback={this.props.connectionRemoveCallback}
                     />
                 )
         }

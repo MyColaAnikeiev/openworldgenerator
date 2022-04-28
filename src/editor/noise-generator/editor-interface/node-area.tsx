@@ -3,7 +3,7 @@ import { ContextMenu, MenuEntry } from "./context.menu";
 import styles from "./node-area.module.scss";
 import { GeneratorNodeComponent } from "./generator-node";
 import { NodeTreeBuilder } from "../node-tree-generator";
-import { NodeSchemaSubtype, NodeSchemaType } from "../types";
+import { ConnectionTargetType, NodeSchemaSubtype, NodeSchemaType } from "../types";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
 import { NodeConnectionsComponent } from "./node-connections";
 
@@ -112,7 +112,7 @@ export class NodeArea extends Component{
                     outputId: nodeSchema.id
                 }})
             }
-            const connectionEndCallback = (connType: "default" | "scale-filter.control", connInd: number) => {
+            const connectionEndCallback = (connType: ConnectionTargetType, connInd: number) => {
                 if(this.state.connectionDrag.on){
 
                     this.props.nodeTreeBuilder.addConnection({
@@ -122,6 +122,11 @@ export class NodeArea extends Component{
                         targetEntryNumber: connInd
                     });
                     this.setState({ connectionDrag : { on: false, outputId: 0}});
+                }
+            }
+            const connectionRemoveCallback = (connType: ConnectionTargetType, connInd: number) => {
+                if(!this.props.selectionMode){
+                    this.props.nodeTreeBuilder.removeConnection(nodeSchema.id, connType, connInd);
                 }
             }
 
@@ -138,6 +143,7 @@ export class NodeArea extends Component{
                     outputCallback={out}
                     connectionStartCallback={connectionStartCallback}
                     connectionEndCallback={connectionEndCallback}
+                    connectionRemoveCallback={connectionRemoveCallback}
                     preview$={preview$}
                 />
             )
