@@ -26,17 +26,21 @@ export class GeneratorNodeComponent extends Component{
 
     state: {
         drag: {
-            on: boolean,
-            lastX: number,
-            lastY: number,
+            on: boolean
         }
     }
+
+    dragging = {
+        lastX: 0,
+        lastY: 0
+    };
+
 
     constructor(props){
         super(props);
 
         this.state = {
-            drag:  { on: false, lastX: 0, lastY: 0 }
+            drag:  { on: false }
         }
 
         this.props.preview$.pipe(
@@ -54,6 +58,8 @@ export class GeneratorNodeComponent extends Component{
             left: this.props.schema.position.left.toString() + 'px'
         }
         const properties = this.props.schema.properties as SourceSchemaProperties;
+        // 
+        const dragHelper = { display: this.state.drag.on ? 'block' : 'none' }
 
         return (
             <div 
@@ -67,9 +73,13 @@ export class GeneratorNodeComponent extends Component{
                     onMouseDown={this.handleMousedown.bind(this)}
                     onMouseMove={this.handleMousemove.bind(this)}
                     onMouseUp={this.handleMouseup.bind(this)}
-                    onMouseLeave={this.handleMouseleve.bind(this)}
                     onContextMenu={this.handleContextMenu.bind(this)}
                 >
+                    <div 
+                        className={styles['drag-helper']} style={dragHelper}
+                        onMouseLeave={this.handleMouseleve.bind(this)}
+                    ></div>
+
                     <div className={styles.head}>
                         <span>{this.getNodeTitle()}</span>
                     </div>
@@ -180,12 +190,13 @@ export class GeneratorNodeComponent extends Component{
             return;
         }
 
+        this.dragging.lastX = evt.clientX;
+        this.dragging.lastY = evt.clientY;
+
         /* Start dragging */
         this.setState({
             drag: {
-                on: true,
-                lastX: evt.clientX,
-                lastY: evt.clientY
+                on: true
             }
         })
     }
@@ -196,24 +207,19 @@ export class GeneratorNodeComponent extends Component{
 
         const {position} = this.props.schema;
 
-        position.left += evt.clientX - this.state.drag.lastX;
-        position.top += evt.clientY - this.state.drag.lastY;
+        position.left += evt.clientX - this.dragging.lastX;
+        position.top += evt.clientY - this.dragging.lastY;
 
-        this.setState({
-            drag: {
-                on: true,
-                lastX: evt.clientX,
-                lastY: evt.clientY
-            }
-        })
+        this.dragging.lastX = evt.clientX;
+        this.dragging.lastY = evt.clientY;
 
+        this.setState({})
     }
+
     dragOver(){
         this.setState({
             drag: {
-                on: false,
-                lastX: 0,
-                lastY: 0
+                on: false
             }
         })
     }

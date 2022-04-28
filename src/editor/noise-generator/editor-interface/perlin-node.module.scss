@@ -15,7 +15,19 @@ $textColor: rgb(170, 170, 170);
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */
 
+    .drag-helper{
+        display: none;
+        width: 580px;
+        left: -200px;
+        height: 580px;
+        top: -200px;
+        position: absolute;
+        //background-color: rgba(59, 59, 59, 0.096);
+        z-index: 100;
+    }
+
     .head{
+        position: relative;
         height: 16px;
         padding-top: 5px;
         background-color: inherit;
