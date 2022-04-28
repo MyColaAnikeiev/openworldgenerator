@@ -250,63 +250,57 @@ export class NodeArea extends Component{
 
         return [
             {
-                text: "Add",
+                text: "+Source",
+                action: nodeAdder("source", "perlin"),
+                submenu: []
+            },
+            {
+                text: "+Combinator",
                 action: () => {},
                 submenu: [
                     {
-                        text: "Source",
-                        action: nodeAdder("source", "perlin"),
+                        text: "Sum",
+                        action: nodeAdder("combinator", "combinator"),
                         submenu: []
                     },
                     {
-                        text: "Combinator",
-                        action: () => {},
-                        submenu: [
-                            {
-                                text: "Sum",
-                                action: nodeAdder("combinator", "combinator"),
-                                submenu: []
-                            },
-                            {
-                                text: "Weighted sum",
-                                action: nodeAdder("combinator", "weighted-combinator"),
-                                submenu: []
-                            }
-                        ]
+                        text: "Weighted sum",
+                        action: nodeAdder("combinator", "weighted-combinator"),
+                        submenu: []
+                    }
+                ]
+            },
+            {
+                text: "+Filter",
+                action: () => {},
+                submenu: [
+                    {
+                        text: "Scale",
+                        action: nodeAdder("filter", "scale"),
+                        submenu: []
                     },
                     {
-                        text: "Filter",
-                        action: () => {},
-                        submenu: [
-                            {
-                                text: "Scale",
-                                action: nodeAdder("filter", "scale"),
-                                submenu: []
-                            },
-                            {
-                                text: "DynamicScale",
-                                action: nodeAdder("filter", "dynamic-scale"),
-                                submenu: []
-                            },
-                            {
-                                text: "Binary",
-                                action: nodeAdder("filter", "binary"),
-                                submenu: []
-                            },
-                            {
-                                text: "Limit",
-                                action: nodeAdder("filter", "limit"),
-                                submenu: []
-                            },
-                            {
-                                text: "Smooth limit",
-                                action: nodeAdder("filter", "smooth-limit"),
-                                submenu: []
-                            }
-                        ]
+                        text: "DynamicScale",
+                        action: nodeAdder("filter", "dynamic-scale"),
+                        submenu: []
+                    },
+                    {
+                        text: "Binary",
+                        action: nodeAdder("filter", "binary"),
+                        submenu: []
+                    },
+                    {
+                        text: "Limit",
+                        action: nodeAdder("filter", "limit"),
+                        submenu: []
+                    },
+                    {
+                        text: "Smooth limit",
+                        action: nodeAdder("filter", "smooth-limit"),
+                        submenu: []
                     }
-                ] 
-            },
+                ]
+            },  
             {
                 text: "Cancel",
                 action: () => {},
