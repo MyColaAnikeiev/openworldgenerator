@@ -126,12 +126,22 @@ export function NoiseLimiterFilterFactory(node: GeneratorNode, params: FilterPar
 export function NoiseSmoothLimiterFilterFactory(node: GeneratorNode, params: FilterParams){
     const maxValue = params.maxValue !== undefined ? params.maxValue : 1.0;
     const minValue = params.minValue !== undefined ? params.minValue : -1.0;
+    const smoothness = params.smoothness !== undefined ? params.smoothness : 1.0;
+
     const midValue = (maxValue + minValue) / 2.0;
     const half = maxValue - midValue;
 
+    /* I got these parameters from function ploting software. */
+    const a = 27.7 / smoothness;
+    const b = 5.6 / smoothness;
+    const c = 1 / (1 + a);
+    const d = (1 + a) / a;
+
     return function(x: number, y: number){
-        let val = node.getValue(x,y) - midValue;
-        val = half * (val*val) / (0.3 * half + val*val) * Math.sign(val) + midValue;
-        return val;
+        const val = (node.getValue(x,y) - midValue) / half;
+        const aVal = Math.abs(val)
+        const part = Math.exp(b*aVal) + a*aVal;
+        const result = ((part / (a + part)) - c) * d;
+        return Math.sign(val) * result * half + midValue;
     }
 }

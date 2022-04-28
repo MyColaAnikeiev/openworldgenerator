@@ -68,13 +68,13 @@ export class NodeConnectionsComponent extends Component{
                     switch(scheme.subtype){
                         case "scale":
                         case "limit":
-                        case "smooth-limit":
                             y += 248;
                             break;
                         case "dynamic-scale":
                             y += 222;
                             break;
                         case "binary":
+                        case "smooth-limit":
                             y += 275;
                             break
                     }

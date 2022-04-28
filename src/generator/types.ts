@@ -25,7 +25,8 @@ export interface NodeParamsUpdateChanges{
 
     // Limiter
     maxValue?: number,
-    minValue?: number
+    minValue?: number,
+    smoothness?: number
 }
 
 export type FilterParams = { 
@@ -43,7 +44,8 @@ export type FilterParams = {
     
     // Limiter
     maxValue?: number,
-    minValue?: number
+    minValue?: number,
+    smoothness?: number
 }
 
 export type FilterFactory = (node: GeneratorNode, params: FilterParams) => ((x: number, y:number) => number)

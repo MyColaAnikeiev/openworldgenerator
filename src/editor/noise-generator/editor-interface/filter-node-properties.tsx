@@ -1,6 +1,6 @@
 import { Component, FormEvent, MouseEvent } from "react";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
-import { ConnectionTargetType, FilterSchemaProperties, NodeSchema } from "../types";
+import { ConnectionTargetType, NodeSchema } from "../types";
 import styles from "./filter-node-properties.module.scss";
 
 export class FilterNodeProperties extends Component{
@@ -14,7 +14,7 @@ export class FilterNodeProperties extends Component{
     }
 
     render(){
-        const properties = this.props.schema.properties as FilterSchemaProperties;
+        const properties = this.props.schema.properties;
 
         const handleInputHookContextClick = (evt: MouseEvent) => {
             debugger
@@ -152,6 +152,17 @@ export class FilterNodeProperties extends Component{
                                 value={properties.minValue}
                             />
                         </div>
+                    ),
+                    (
+                        <div key="smoothness" className={styles.row}>
+                            <label>smoothness:</label>
+                            <input
+                                name="smoothness"
+                                type="number" min="1.0" step="0.1"
+                                onInput={(evt: FormEvent) => this.handleInput(evt)}
+                                value={properties.smoothness}
+                            />
+                        </div>
                     )
                 ]
         }
@@ -187,6 +198,9 @@ export class FilterNodeProperties extends Component{
         }
         if(elm.name === "minValue"){
             this.props.outputCallback({ minValue: parseFloat(elm.value)})
+        }
+        if(elm.name === "smoothness"){
+            this.props.outputCallback({ smoothness: parseFloat(elm.value)})
         }
     }
 

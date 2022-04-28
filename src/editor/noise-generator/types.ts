@@ -21,14 +21,6 @@ export type CombinatorSchemaProperties = {
 
 export type NoiseFilterType = "scale" | "dynamic-scale" | "binary";
 
-export type FilterSchemaProperties = {
-    scale?: number,
-    add?: number,
-    threshold?: number,
-    upperValue?: number,
-    lowerValue?: number
-}
-
 export type NodeSchemaProperties = {
     size?: number,
     seed?: number,
@@ -40,7 +32,8 @@ export type NodeSchemaProperties = {
     upperValue?: number,
     lowerValue?: number,
     maxValue?: number,
-    minValue?: number
+    minValue?: number,
+    smoothness?: number
 }
 
 export interface NodeSchema{ 
