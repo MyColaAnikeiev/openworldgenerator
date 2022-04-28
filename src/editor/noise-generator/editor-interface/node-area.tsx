@@ -251,8 +251,34 @@ export class NodeArea extends Component{
         return [
             {
                 text: "+Source",
-                action: nodeAdder("source", "perlin"),
-                submenu: []
+                action: () => {},
+                submenu: [
+                    {
+                        text: "Perlin",
+                        action: nodeAdder("source", "perlin"),
+                        submenu: []
+                    },
+                    {
+                        text: "Simple-Noise",
+                        action: nodeAdder("source", "simple-noise"),
+                        submenu: []
+                    },
+                    {
+                        text: "Simple-Noise2",
+                        action: nodeAdder("source", "simple-noise2"),
+                        submenu: []
+                    },
+                    {
+                        text: "Voronoi",
+                        action: nodeAdder("source", "voronoi"),
+                        submenu: []
+                    },
+                    {
+                        text: "Cellular",
+                        action: nodeAdder("source", "cellular"),
+                        submenu: []
+                    }
+                ]
             },
             {
                 text: "+Combinator",

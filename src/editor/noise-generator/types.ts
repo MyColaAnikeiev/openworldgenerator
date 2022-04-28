@@ -2,7 +2,7 @@ export type NodeSchemaType = 'source' | 'combinator' | 'filter';
 
 export type NodeSchemaSubtype = 
     // Generators    
-        'perlin' |
+        'perlin' | 'simple-noise' | 'simple-noise2' | 'voronoi' | "cellular" |
     // Combinators
         'combinator' | 'weighted-combinator' |
     // Filters

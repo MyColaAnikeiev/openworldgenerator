@@ -1,4 +1,4 @@
-import { filter, map, Observable, startWith, Subject } from "rxjs";
+import { debounce, debounceTime, delayWhen, filter, interval, map, Observable, of, startWith, Subject } from "rxjs";
 import { 
     NodeWeightPair, 
     NoiseCombine, 
@@ -26,6 +26,8 @@ import {
     NodeSchemaSubtype, 
     NodeSchemaType,    
     SourceSchemaProperties } from "./types"
+import { SimpleNoiseGenerator, SimpleNoiseGenerator2 } from "../../generator/simple-noise";
+import { VoronoiGenerator } from "../../generator/voronoi-source";
 
 
 
@@ -69,7 +71,7 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
         let props: NodeSchemaProperties = {};
         switch (type){
             case "source":
-                // Make default seeds apear with interval of 16 
+                // Make default seeds apear with interval of 8
                 const maxSeed = Math.ceil((this.getMaxOfSchemaProperty("seed")+1)/8)*8;
                 props = { size: 1.0, seed: maxSeed }
                 break;
@@ -263,8 +265,11 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
         id: number, scale:number = 16, width: number = 180, height: number = 120)
     : Observable<ImageData>
     {
+        let pending = false;
+        
 
         return this.updated$.pipe(
+            debounce(() => pending ? interval(200) : of(0)),
             filter(changedId => {
                 if(id === changedId){
                     return true;
@@ -285,8 +290,10 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
             startWith(id),
             map(() => {
                 const node = this.getNodeInstance(id);
+                pending = true;
                 if(node){
                     return getImageFromGeneratorNode(node, scale, width, height);
+                    pending = false;
                 }
                 // Return blank if node can't be instantiated.
                 return new ImageData(width, height);
@@ -319,8 +326,26 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
     }
     
     private instantiateSource(schema: NodeSchema): GeneratorNode{
-        const props = schema.properties as SourceSchemaProperties;
-        const instance = new PerlinNoise(props.size, props.seed)
+        const props = schema.properties;
+        let instance: GeneratorNode;
+
+        switch(schema.subtype){
+            case "perlin":
+                instance = new PerlinNoise(props.size, props.seed)
+                break;
+            case "simple-noise":
+                instance = new SimpleNoiseGenerator(props.size, props.seed);
+                break;
+            case "simple-noise2":
+                instance = new SimpleNoiseGenerator2(props.size, props.seed);
+                break;
+            case "voronoi":
+                instance = new VoronoiGenerator(props.size, props.seed);
+                break;
+            case "cellular":
+                instance = new VoronoiGenerator(props.size, props.seed, true);
+                break;
+        }
         this.nodes.set(schema.id, instance);
         return instance;
     }

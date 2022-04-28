@@ -129,6 +129,30 @@ export class FilterNodeProperties extends Component{
                     )
                 ]
             case "limit":
+                return [
+                    (
+                        <div key="maxValue" className={styles.row}>
+                            <label>max:</label>
+                            <input
+                                name="maxValue"
+                                type="number" step="0.1"
+                                onInput={(evt: FormEvent) => this.handleInput(evt)}
+                                value={properties.maxValue}
+                            />
+                        </div>
+                    ),
+                    (
+                        <div key="minValue" className={styles.row}>
+                            <label>min:</label>
+                            <input
+                                name="minValue"
+                                type="number" step="0.1"
+                                onInput={(evt: FormEvent) => this.handleInput(evt)}
+                                value={properties.minValue}
+                            />
+                        </div>
+                    )
+                ]
             case "smooth-limit":
                 return [
                     (
