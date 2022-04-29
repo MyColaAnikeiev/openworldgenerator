@@ -259,6 +259,11 @@ export class NodeArea extends Component{
                         submenu: []
                     },
                     {
+                        text: "Simplex",
+                        action: nodeAdder("source", "simplex"),
+                        submenu: []
+                    },
+                    {
                         text: "Simple-Noise",
                         action: nodeAdder("source", "simple-noise"),
                         submenu: []
