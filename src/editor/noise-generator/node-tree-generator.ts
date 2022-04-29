@@ -1,4 +1,4 @@
-import { debounce, debounceTime, delayWhen, filter, interval, map, Observable, of, startWith, Subject } from "rxjs";
+import { debounce, filter, interval, map, Observable, of, startWith, Subject } from "rxjs";
 import { 
     NodeWeightPair, 
     NoiseCombine, 
@@ -24,10 +24,11 @@ import {
     NodeSchema, 
     NodeSchemaProperties, 
     NodeSchemaSubtype, 
-    NodeSchemaType,    
-    SourceSchemaProperties } from "./types"
+    NodeSchemaType 
+} from "./types"
 import { SimpleNoiseGenerator, SimpleNoiseGenerator2 } from "../../generator/simple-noise";
 import { VoronoiGenerator } from "../../generator/voronoi-source";
+import { SimplexNoise } from "../../generator/simplex-noise";
 
 
 
@@ -48,7 +49,8 @@ export interface NodeTreeBuilder{
 }
 
 export interface NodeTreeUser{
-    getNodeInstance(id: number, depth: number): GeneratorNode | null;
+    getNodeInstance(id: number): GeneratorNode | null;
+    getNodeInstance$(id: number): Observable<GeneratorNode | null>;
     getNodeSchemas(): NodeSchema[];
     getNodeConnections(): NodeConnection[];
 }
@@ -333,6 +335,9 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
             case "perlin":
                 instance = new PerlinNoise(props.size, props.seed)
                 break;
+            case "simplex":
+                instance = new SimplexNoise(props.size, props.seed)
+                break;
             case "simple-noise":
                 instance = new SimpleNoiseGenerator(props.size, props.seed);
                 break;
@@ -348,6 +353,20 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
         }
         this.nodes.set(schema.id, instance);
         return instance;
+    }
+
+
+    /**
+     * Observable streams all new instances of requested id schema that apears during editing.  
+     */
+    getNodeInstance$(id: number): Observable<GeneratorNode | null>{
+        return this.updated$.pipe(
+            startWith(id),
+            filter(curId => curId === id),
+            map(id => {
+                return this.getNodeInstance(id);
+            })
+        )
     }
 
     private instantiateCombinator(schema: NodeSchema): GeneratorNode{
