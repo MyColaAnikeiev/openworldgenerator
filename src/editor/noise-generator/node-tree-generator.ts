@@ -1,4 +1,4 @@
-import { debounce, filter, interval, map, Observable, of, startWith, Subject } from "rxjs";
+import { debounce, filter, interval, map, Observable, startWith, Subject } from "rxjs";
 import { 
     NodeWeightPair, 
     NoiseCombine, 
@@ -155,8 +155,6 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
     }
 
     updateNodeConnections(id: number){
-        const schema = this.nodeSchemas.find(schema => schema.id === id);
-
         this.nodes.delete(id);
         this.getNodeInstance(id);
 
@@ -183,16 +181,17 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
         // Remove connections if present
         this.connections = this.connections
             .filter( (con: NodeConnection) => (con.idFrom !== id && con.idTo !== id));
-
+        // Remove Node
         const index = this.nodeSchemas.findIndex(node => node.id == id);
         this.nodeSchemas.splice(index, 1);
         this.nodes.delete(id);
 
+        this.updated$.next(id);
+
         outConnections.forEach((conn) => {
             this.updateNodeConnections(conn.idTo);
-            this.updated$.next(conn.idTo);
+            this.updated$.next(conn.idTo);  
         });
-        this.updated$.next(id);
     }
 
     getNodeSchemas(): NodeSchema[]{
@@ -267,12 +266,12 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
         id: number, scale:number = 16, width: number = 180, height: number = 120)
     : Observable<ImageData>
     {
-        let pending = false;
         
+        // Time it took to generate previous preview image.
+        let generationTime = 0;
 
         return this.updated$.pipe(
-            debounce(() => pending ? interval(200) : of(0)),
-            filter(changedId => {
+            filter((changedId) => {
                 if(id === changedId){
                     return true;
                 }
@@ -289,13 +288,20 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
                 return isRelated(id);
             }),
-            startWith(id),
+            // The node that you are curently editing is more likely to be
+            // updated first.
+            debounce( () => {
+                return interval(generationTime * 1.1);
+            }),
+            startWith({id, timeDiff: 0}),
             map(() => {
                 const node = this.getNodeInstance(id);
-                pending = true;
                 if(node){
-                    return getImageFromGeneratorNode(node, scale, width, height);
-                    pending = false;
+                    const beg = Date.now();
+                    const image = getImageFromGeneratorNode(node, scale, width, height);
+                    const end = Date.now();
+                    generationTime = (end - beg) * 1.2;
+                    return image;
                 }
                 // Return blank if node can't be instantiated.
                 return new ImageData(width, height);
