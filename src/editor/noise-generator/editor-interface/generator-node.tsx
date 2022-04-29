@@ -16,7 +16,7 @@ export class GeneratorNodeComponent extends Component{
     props: { 
         schema: NodeSchema,
         selectionMode: boolean,
-        contextMenuTrigger: (evt: MouseEvent) => void,
+        contextMenuTrigger: (node: GeneratorNodeComponent, evt: MouseEvent) => void,
         outputCallback: (out: NodeParamsUpdateChanges) => void,
         connectionStartCallback: () => void,
         connectionEndCallback: (connType: ConnectionTargetType, connIndex: number) => void,
@@ -28,7 +28,8 @@ export class GeneratorNodeComponent extends Component{
     state: {
         drag: {
             on: boolean
-        }
+        },
+        previewOn: boolean
     }
 
     dragging = {
@@ -41,16 +42,11 @@ export class GeneratorNodeComponent extends Component{
         super(props);
 
         this.state = {
-            drag:  { on: false }
+            drag:  { on: false },
+            previewOn: false
         }
 
-        this.props.preview$.pipe(
-            delay(0),
-            takeUntil(this.unsubscriber$)
-        )
-            .subscribe((img: ImageData) => {
-                this.canvasRef.getContext('2d').putImageData(img, 0,0);
-            })
+        this.previewOn();
     }
 
     render(){
@@ -58,8 +54,9 @@ export class GeneratorNodeComponent extends Component{
             top: this.props.schema.position.top.toString() + 'px',
             left: this.props.schema.position.left.toString() + 'px'
         }
-        const properties = this.props.schema.properties as SourceSchemaProperties;
-        // 
+        const inlineCanvasStyle = {
+            display: this.props.schema.previewOn ? "block" : "none"
+        }
         const dragHelper = { display: this.state.drag.on ? 'block' : 'none' }
 
         return (
@@ -84,7 +81,7 @@ export class GeneratorNodeComponent extends Component{
                     <div className={styles.head}>
                         <span>{this.getNodeTitle()}</span>
                     </div>
-                    <div className={styles.preview}>
+                    <div className={styles.preview} style={inlineCanvasStyle}>
                             <canvas 
                                 ref={ref => this.canvasRef = ref}
                                 width="180" height="120"
@@ -177,7 +174,7 @@ export class GeneratorNodeComponent extends Component{
             return;
         }
 
-        this.props.contextMenuTrigger(evt);
+        this.props.contextMenuTrigger(this, evt);
     }
     handleOutputConnectionStart(evt: MouseEvent){
         if(this.props.selectionMode){
@@ -227,6 +224,24 @@ export class GeneratorNodeComponent extends Component{
         })
     }
 
+    previewOn(){
+        this.unsubscriber$.next();
+        this.props.preview$.pipe(
+            takeUntil(this.unsubscriber$),
+            delay(0)
+        )
+        .subscribe((img: ImageData) => {
+            this.canvasRef.getContext('2d').putImageData(img, 0,0);
+        })
+
+        this.props.schema.previewOn = true;
+    }
+
+    previewOff(){
+        this.unsubscriber$.next();
+        this.canvasRef.getContext('2d').putImageData(new ImageData(180,120),0,0);
+        this.props.schema.previewOn = false;
+    }
 
     componentWillUnmount(){
         this.unsubscriber$.next();

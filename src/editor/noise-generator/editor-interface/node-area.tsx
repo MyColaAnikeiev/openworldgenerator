@@ -101,7 +101,10 @@ export class NodeArea extends Component{
 
         return nodeSchemas.map( nodeSchema => {
 
-            const menuTrigger = (evt: MouseEvent) => this.handleNodeContextClick(evt, nodeSchema.id);
+            const menuTrigger = (node: GeneratorNodeComponent, evt: MouseEvent) => {
+                this.handleNodeContextClick(evt, nodeSchema.id, node);
+            }
+
             const out = (changes: NodeParamsUpdateChanges) => { 
                 this.props.nodeTreeBuilder.updateNodeParameters(nodeSchema.id, changes);
                 this.setState({});
@@ -212,20 +215,35 @@ export class NodeArea extends Component{
         }
     }
 
-    handleNodeContextClick(evt: MouseEvent, nodeId: number){
+    handleNodeContextClick(evt: MouseEvent, nodeId: number, node: GeneratorNodeComponent){
         evt.preventDefault();
-
         if(this.props.selectionMode){
             return;
         }
+
+        const schema = this.props.nodeTreeBuilder.getNodeSchemas()
+            .find((schema => schema.id === nodeId));
         
         const menu: MenuEntry[] = [
             {
                 text: "Remove",
                 action: () => this.props.nodeTreeBuilder.removeNode(nodeId),
                 submenu: []
+            },
+            {
+                text: schema.previewOn ? "No preview" : "Show preview",
+                action: () => {
+                    if(schema.previewOn) 
+                        node.previewOff();
+                    else
+                        node.previewOn();
+                },
+                submenu: []
             }
         ]
+
+
+
 
         this.setState({ 
             contextMenu: { 

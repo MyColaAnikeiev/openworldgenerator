@@ -81,28 +81,36 @@ export class NodeConnectionsComponent extends Component{
                     break;
             }
 
+            if(!scheme.previewOn){
+                y -= 130;
+            }
             return {x,y};
         }
 
         function getInputPosition(connection: NodeConnection){
             const scheme = nodes.find(scheme => scheme.id === connection.idTo);
+            let x: number, y: number;
 
             if(scheme.type === "combinator"){
                 const connIndex = connection.targetEntryNumber;
-                const x = scheme.position.left + 2;
-                const y = scheme.position.top + 224 + connIndex * 26;
-                return {x,y}
+                x = scheme.position.left + 2;
+                y = scheme.position.top + 224 + connIndex * 26;
             }
+            else if(scheme.type === "filter"){
+                x = scheme.position.left; 
+                y = scheme.position.top + 168;
 
-            if(scheme.type === "filter"){
                 if(scheme.subtype === "dynamic-scale"){
                     if(connection.targetType === "scale-filter.control"){
-                        return {x: scheme.position.left, y: scheme.position.top + 192}
+                        y = scheme.position.top + 192;
                     }
                 }
-
-                return {x: scheme.position.left, y: scheme.position.top + 168}
             }
+
+            if(!scheme.previewOn){
+                y -= 130;
+            }
+            return {x, y}
         }
         
         const sizes = this.props.styles.nodeAreaSizes;

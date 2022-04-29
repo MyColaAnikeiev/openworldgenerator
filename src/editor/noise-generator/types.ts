@@ -38,7 +38,8 @@ export type NodeSchemaProperties = {
 
 export interface NodeSchema{ 
     id: number,
-    name?: string
+    name?: string,
+    previewOn: boolean,
     type: NodeSchemaType,
     subtype: NodeSchemaSubtype,
     position: {
