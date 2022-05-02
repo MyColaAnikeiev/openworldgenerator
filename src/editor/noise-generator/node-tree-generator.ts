@@ -35,6 +35,7 @@ import { SimplexNoise } from "../../generator/simplex-noise";
 export interface NodeTreeBuilder{
     getNodeSchemas(): NodeSchema[];
     getNodeConnections(): NodeConnection[];
+    getNodeInstance$(id: number): Observable<GeneratorNode | null>;
 
     addNode(type: NodeSchemaType, subtype: NodeSchemaSubtype, top: number, left: number): void;
     removeNode(id: number): void;
@@ -256,6 +257,37 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
 
     /**
+     * @id that will be emited every time when node with that id is changed.
+     */
+    getUpdateStream$(id: number): Observable<number>{
+        return this.updated$.pipe(
+            filter((changedId) => {
+                if(id === changedId){
+                    return true;
+                }
+
+                const isRelated = (curId: number, depth: number = 20) => {
+                    if(depth <= 0){
+                        return false;
+                    }
+
+                    if(this.connections.some(conn => conn.idTo === curId && conn.idFrom === changedId)){
+                        return true;
+                    }
+                    
+                    return this.connections
+                        .filter(conn => conn.idTo === curId)
+                        .some(conn => isRelated(conn.idFrom, depth-1));
+                }
+
+                return isRelated(id);
+            }),
+            startWith(id),
+            map(() => id)
+        )
+    }
+
+    /**
      * 
      * @param id `GeneratorNode` id.
      * @param scale tells how much pixels (for preview) corespond to one unit of perlin map. 
@@ -271,37 +303,19 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
         // Time it took to generate previous preview image.
         let generationTime = 0;
 
-        return this.updated$.pipe(
-            filter((changedId) => {
-                if(id === changedId){
-                    return true;
-                }
-
-                const isRelated = (curId: number, depth: number = 20) => {
-                    if(this.connections.some(conn => conn.idTo === curId && conn.idFrom === changedId)){
-                        return true;
-                    }
-                    
-                    return this.connections
-                        .filter(conn => conn.idTo === curId)
-                        .some(conn => isRelated(conn.idFrom, depth-1));
-                }
-
-                return isRelated(id);
-            }),
+        return this.getUpdateStream$(id).pipe(
             // The node that you are curently editing is more likely to be
             // updated first.
             debounce( () => {
-                return interval(generationTime * 1.1);
+                return interval(generationTime);
             }),
-            startWith({id, timeDiff: 0}),
             map(() => {
                 const node = this.getNodeInstance(id);
                 if(node){
                     const beg = Date.now();
                     const image = getImageFromGeneratorNode(node, scale, width, height);
                     const end = Date.now();
-                    generationTime = (end - beg) * 1.2;
+                    generationTime = (end - beg) * 1.35;
                     return image;
                 }
                 // Return blank if node can't be instantiated.
@@ -364,12 +378,10 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
 
     /**
-     * Observable streams all new instances of requested id schema that apears during editing.  
+     * Will emit node instance (it could be the same class instance) on every change.  
      */
     getNodeInstance$(id: number): Observable<GeneratorNode | null>{
-        return this.updated$.pipe(
-            startWith(id),
-            filter(curId => curId === id),
+        return this.getUpdateStream$(id).pipe(
             map(id => {
                 return this.getNodeInstance(id);
             })
