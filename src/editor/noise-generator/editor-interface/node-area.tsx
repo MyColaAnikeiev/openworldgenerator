@@ -6,8 +6,10 @@ import { NodeTreeBuilder } from "../node-tree-generator";
 import { ConnectionTargetType, NodeSchemaSubtype, NodeSchemaType } from "../types";
 import { NodeParamsUpdateChanges } from "../../../generator/types";
 import { NodeConnectionsComponent } from "./node-connections";
+import { NodeViewer } from "./node-viewer";
 
-
+type Position = { top: number, left: number }
+ 
 export class NodeArea extends Component{
 
     props: {
@@ -25,14 +27,18 @@ export class NodeArea extends Component{
         },
         contextMenu: {
             on: boolean,
-            position: { top: number, left: number},
+            position: Position,
             menuEntries: MenuEntry[]
         },
         connectionDrag:{
             on: false,
             outputId: number
-        }
+        },
+        // array of id's
+        node2dViewers: { sourceId: number, top: number, left: number }[];
     }
+
+    node2dViewersSet: Map<number, Position> = new Map();
 
     connectionsRenderCallback!: (evt: MouseEvent | null) => void;
 
@@ -54,7 +60,8 @@ export class NodeArea extends Component{
                 position: { top: 0, left: 0 },
                 menuEntries: this.getMenuEntries()
             },
-            connectionDrag: { on: false, outputId: 0}
+            connectionDrag: { on: false, outputId: 0},
+            node2dViewers: []
         };
     }
 
@@ -63,35 +70,41 @@ export class NodeArea extends Component{
         const nodes = this.getNodes();
 
         return (
-            <div 
-                className={styles['node-area']} 
-                style={areaSizes}
-
-                onMouseDown={this.handleMouseDown.bind(this)}
-                onMouseMove={this.handleMousemove.bind(this)}
-                onMouseUp={this.handleMouseup.bind(this)}
-                onContextMenu={this.handleContextClick.bind(this)}
-            >
-                <NodeConnectionsComponent 
-                    nodeTreeBuilder={this.props.nodeTreeBuilder}
-                    styles={this.state.styles}
-                    connectionDrag={this.state.connectionDrag}
-                    updateCallback={(callback) => {this.connectionsRenderCallback = callback}}
-                />
-
+            <div className={styles.wrapper}>
                 <div 
-                    className={styles['node-area-holder']}
-                    ref={ref => this.nodeAreaHolderRef = ref}
+                    className={styles['node-area']} 
+                    style={areaSizes}
+
+                    onMouseDown={this.handleMouseDown.bind(this)}
+                    onMouseMove={this.handleMousemove.bind(this)}
+                    onMouseUp={this.handleMouseup.bind(this)}
+                    onContextMenu={this.handleContextClick.bind(this)}
                 >
-                    {nodes}
+                    <NodeConnectionsComponent 
+                        nodeTreeBuilder={this.props.nodeTreeBuilder}
+                        styles={this.state.styles}
+                        connectionDrag={this.state.connectionDrag}
+                        updateCallback={(callback) => {this.connectionsRenderCallback = callback}}
+                    />
+
+                    <div 
+                        className={styles['node-area-holder']}
+                        ref={ref => this.nodeAreaHolderRef = ref}
+                    >
+                        {nodes}
+                    </div>
+
+                    <ContextMenu 
+                        on={this.state.contextMenu.on} 
+                        position={this.state.contextMenu.position}
+                        menuEntries={this.state.contextMenu.menuEntries}
+                    />
+
                 </div>
 
-                <ContextMenu 
-                    on={this.state.contextMenu.on} 
-                    position={this.state.contextMenu.position}
-                    menuEntries={this.state.contextMenu.menuEntries}
-                />
-
+                <div className="viewers">
+                    {this.getViewers()}
+                </div>
             </div>
         )
     }
@@ -152,6 +165,34 @@ export class NodeArea extends Component{
             )
 
         })
+    }
+
+
+    getViewers(){
+        const viewers = this.state.node2dViewers.map(viewer => {
+            const { nodeTreeBuilder } = this.props;
+            
+            const closeCallback = () => {
+                this.node2dViewersSet.delete(viewer.sourceId);
+                this.setState({
+                    node2dViewers: Array.from(this.node2dViewersSet.entries())
+                        .map(entry => ({sourceId: entry[0], ...entry[1]}))
+                })
+            }
+
+            return (
+                <NodeViewer 
+                    key={viewer.sourceId.toString()}
+                    selectionMode={this.props.selectionMode}
+                    nodeUpdate$={nodeTreeBuilder.getNodeInstance$(viewer.sourceId)}
+                    closeCallback={closeCallback}
+                    top={viewer.top}
+                    left={viewer.left}
+                />
+            )
+        })
+
+        return viewers;
     }
 
 
@@ -221,6 +262,8 @@ export class NodeArea extends Component{
             return;
         }
 
+        const clickPosition = this.getPositionFromEvent(evt);
+
         const schema = this.props.nodeTreeBuilder.getNodeSchemas()
             .find((schema => schema.id === nodeId));
         
@@ -242,14 +285,25 @@ export class NodeArea extends Component{
             }
         ]
 
-
-
+        if(!this.node2dViewersSet.has(nodeId)){
+            menu.push({
+                text: "Open Viewer",
+                action: () => {
+                    this.node2dViewersSet.set(nodeId, {...clickPosition});
+                    this.setState({
+                        node2dViewers: Array.from(this.node2dViewersSet.entries())
+                            .map(entry => ({sourceId: entry[0], ...entry[1]}))
+                    })
+                },
+                submenu: []
+            })
+        }
 
         this.setState({ 
             contextMenu: { 
                 on: true,
                 position: {
-                    ...this.getPositionFromEvent(evt)
+                    ...clickPosition
                 },
                 menuEntries: menu
             }
