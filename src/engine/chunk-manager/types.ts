@@ -1,14 +1,5 @@
 import { Object3D } from "three"
 
-export type Position = {
-    x: number,
-    y: number
-}
-
-export type IndexPosition = {
-    i: number,
-    j: number
-}
 
 export enum ChunkReadyState{
     stoped, // Not generated. Was canceled

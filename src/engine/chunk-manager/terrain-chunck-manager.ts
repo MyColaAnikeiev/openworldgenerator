@@ -1,8 +1,9 @@
 import { Observable } from "rxjs";
 import { BufferAttribute, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, PlaneGeometry, RepeatWrapping, Scene, TextureLoader } from "three";
 import { GeneratorNode } from "../../generator/generator-node";
+import { Position } from "../types";
 import { BaseChunkManager } from "./base-chunk-manager";
-import { ChunkArea, ChunkGenState, ChunkInstance, ChunkReadyState, IndexPosition, Position } from "./types";
+import { ChunkArea, ChunkGenState, ChunkInstance, ChunkReadyState } from "./types";
 
 
 export class TerrainChunkManager extends BaseChunkManager{

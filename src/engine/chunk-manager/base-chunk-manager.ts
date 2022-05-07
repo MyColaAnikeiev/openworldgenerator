@@ -1,5 +1,6 @@
 import { Object3D, Scene } from "three"
-import { ChunkArea, ChunkGenState, ChunkInstance, ChunkReadyState, IndexPosition, Position } from "./types"
+import { IndexPosition, Position } from "../types";
+import { ChunkArea, ChunkGenState, ChunkInstance, ChunkReadyState } from "./types"
 
 
 
