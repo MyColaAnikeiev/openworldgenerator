@@ -46,7 +46,7 @@ export abstract class BaseChunkManager{
     /**
      * Based on distance from central chunk `round`, return chunk instance scheme with desired simplification level.
      */
-    abstract getBlankInstance(round: number): ChunkInstance;
+    protected abstract getBlankInstance(round: number): ChunkInstance;
 
     /**
      * 
@@ -54,24 +54,24 @@ export abstract class BaseChunkManager{
      * @param executionTime used to decide if there is need to split task into smaller generation tasks if such spliting is implemented.
      * @return null if task still unfinished.
      */
-    abstract runGenTast(task: ChunkGenState, executionTime: number): Object3D | null;
+    protected abstract runGenTask(task: ChunkGenState, executionTime: number): Object3D | null;
 
     /**
      * If task have any intermediate results then clean them up and revert task to it's
      * initial state. 
      */
-    abstract cleanIntermediateResultsOfgenTask(task: ChunkGenState): void;
+    protected abstract cleanIntermediateResultsOfgenTask(task: ChunkGenState): void;
 
     /**
      * Takes and modifies 3d object on some update which is supposedly is comming from editing.
      * Unlike generation, this function should finish work in one run.
      */
-    abstract runContentUpdateTask(chunkArea: ChunkArea): void;
+    protected abstract runContentUpdateTask(chunkArea: ChunkArea): void;
 
     /**
      * Call dispose method on all objects generated during `runGenTast` call.
      */
-    abstract disposeOfChunkObject(object: Object3D): void;
+    protected abstract disposeOfChunkObject(object: Object3D): void;
     
 
     /**
@@ -175,7 +175,7 @@ export abstract class BaseChunkManager{
     }
 
 
-    public updateChunksContent(): void{
+    protected updateChunksContent(): void{
         const gridSize = this.rounds * 2 + 1;
 
         this.contentUpdateTaskQueue = [];
@@ -303,7 +303,7 @@ export abstract class BaseChunkManager{
             }
 
             const executuionTimeLeft = executionTime - (Date.now() - start);
-            const mesh = this.runGenTast(curTask, executuionTimeLeft);
+            const mesh = this.runGenTask(curTask, executuionTimeLeft);
 
             if(mesh){
 
