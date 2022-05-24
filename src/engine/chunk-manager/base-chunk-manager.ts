@@ -1,5 +1,5 @@
 import { Object3D, Scene } from "three"
-import { IndexPosition, Position } from "../types";
+import { IndexPosition, PlanePosition } from "../types";
 import { ChunkArea, ChunkGenState, ChunkInstance, ChunkReadyState } from "./types"
 
 
@@ -29,7 +29,7 @@ export abstract class BaseChunkManager{
      */
     constructor(
         protected scene: Scene,
-        private viewPosition: Position, 
+        private viewPosition: PlanePosition, 
         protected chunkSize: number, 
         private hysteresis: number,
         private rounds: number
@@ -73,13 +73,44 @@ export abstract class BaseChunkManager{
      * Call dispose method on all objects generated during `runGenTast` call.
      */
     protected abstract disposeOfChunkObject(object: Object3D): void;
+
+
+    /**
+     * Privide current world position (of viewer or player) and based on chunk's state 
+     * it will decide if chunk grid update need to be performed.
+     * 
+     * Even though generating could be very havy, it should be safe to call this function 
+     * in loop sequance on different instances as update itself will be performed asyncronosly.
+     */
+    public setViewPosition(pos: PlanePosition){
+        this.viewPosition = pos;
+        const normalizedPos = { x: pos.x / this.chunkSize, y: pos.y / this.chunkSize }
+
+        const centerX = this.curPosition.i  + 0.5;
+        const centerY = this.curPosition.j  + 0.5;
+        
+        if(
+            Math.abs(normalizedPos.x - centerX) > (0.5 + this.hysteresis) ||
+            Math.abs(normalizedPos.y - centerY) > (0.5 + this.hysteresis)
+        )
+        {
+            this.curPosition.i = Math.floor(normalizedPos.x);
+            this.curPosition.j = Math.floor(normalizedPos.y);
+
+            // updateChunks could be heavy and this function could be called
+            // many times in one macrotask run.
+            if(this.updateChunksTimeoutId === null){
+                this.updateChunksTimeoutId = setTimeout(this.updateChunks.bind(this),);
+            }
+        }
+    }
     
 
     /**
      * When view position is changed enough to trigger update, this function manages
      * chunks by removing one's that is out of range, swapping to one that has suitable optimization 
      * level if such instance is present, or requesting one if not. When suitable chunk instance 
-     * is setup for generation, any currently used chunk in this `ChunkArea` will be keept in 
+     * is set up for generation, any currently used chunk in this `ChunkArea` will be keept in 
      * 3d secene until new instance is generated. Deleting and swapping is done during
      * current script event run. Generation is done asynchronously by task runner.
      */
@@ -89,16 +120,16 @@ export abstract class BaseChunkManager{
         const gridSize = this.rounds*2 + 1;
         const newGrid = this.getEmptyChunkGrid(this.rounds);
 
-        const dI = this.curPosition.i - this.chunksCenter.i;
-        const dJ = this.curPosition.j - this.chunksCenter.j;
+        const deltaI = this.curPosition.i - this.chunksCenter.i;
+        const deltaJ = this.curPosition.j - this.chunksCenter.j;
 
         /* Copy chunks that fits grid and removes when it out of grid. */
         for(let j = 0; j < gridSize; j++){
             for(let i = 0; i < gridSize; i++){
                 const curChunk = this.chunks[j][i];
                 if(curChunk){
-                    const newJ = j - dJ;
-                    const newI = i - dI;
+                    const newJ = j - deltaJ;
+                    const newI = i - deltaI;
 
                     if(newJ < 0 || newJ >= gridSize || newI < 0 || newI >= gridSize){
                         this.freeChunk(curChunk)
@@ -289,7 +320,7 @@ export abstract class BaseChunkManager{
         const start = Date.now();
         this.taskRunnerTimeoutId = null;
 
-        // Update takes priority
+        // Content update takes priority
         if(this.contentUpdateTaskQueue.length !== 0){
             this.triggerTaskRunner();
             return;
@@ -374,32 +405,6 @@ export abstract class BaseChunkManager{
         this.taskRunnerTimeoutId = setTimeout(this.contentUpdateTaskRunner.bind(this),0);
     }
 
-    /**
-     * Through this function, manager will keep track of position changes
-     * and request update when needed.
-     */
-    public setViewPosition(pos: Position){
-        this.viewPosition = pos;
-        const normalizedPos = { x: pos.x / this.chunkSize, y: pos.y / this.chunkSize }
-
-        const centerX = this.curPosition.i  + 0.5;
-        const centerY = this.curPosition.j  + 0.5;
-        
-        if(
-            Math.abs(normalizedPos.x - centerX) > (0.5 + this.hysteresis) ||
-            Math.abs(normalizedPos.y - centerY) > (0.5 + this.hysteresis)
-        )
-        {
-            this.curPosition.i = Math.floor(normalizedPos.x);
-            this.curPosition.j = Math.floor(normalizedPos.y);
-
-            // updateChunks could be heavy and this function could be called
-            // many times in one macrotask run.
-            if(this.updateChunksTimeoutId === null){
-                this.updateChunksTimeoutId = setTimeout(this.updateChunks.bind(this),);
-            }
-        }
-    }
 
     private getEmptyChunkGrid(rounds: number): (ChunkArea | null)[][]{
         const gridSize = rounds*2 + 1;
