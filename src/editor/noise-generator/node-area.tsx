@@ -2,9 +2,9 @@ import { Component, MouseEvent } from "react";
 import { ContextMenu, MenuEntry } from "./context.menu";
 import styles from "./node-area.module.scss";
 import { GeneratorNodeComponent } from "./generator-node";
-import { NodeTreeBuilder } from "../node-tree-generator";
-import { ConnectionTargetType, NodeSchemaSubtype, NodeSchemaType } from "../types";
-import { NodeParamsUpdateChanges } from "../../../generator/types";
+import { NodeTreeBuilder } from "../../generator/node-tree-generator";
+import { ConnectionTargetType, NodeSchemaSubtype, NodeSchemaType } from "../../generator/types";
+import { NodeParamsUpdateChanges } from "../../generator/nodes/types";
 import { NodeConnectionsComponent } from "./node-connections";
 import { NodeViewer } from "./node-viewer";
 

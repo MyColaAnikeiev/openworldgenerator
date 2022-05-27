@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
-import { BufferAttribute, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, PlaneGeometry, RepeatWrapping, Scene, TextureLoader } from "three";
-import { GeneratorNode } from "../../generator/generator-node";
+import { BufferAttribute, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Scene } from "three";
+import { GeneratorNode } from "../../generator/nodes/generator-node";
 import { PlanePosition } from "../types";
 import { BaseChunkManager } from "./base-chunk-manager";
 import { ChunkArea, ChunkGenState, ChunkInstance, ChunkReadyState } from "./types";

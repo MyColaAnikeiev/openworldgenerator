@@ -1,6 +1,6 @@
 import { Component, FormEvent, MouseEvent } from "react";
-import { NodeParamsUpdateChanges } from "../../../generator/types";
-import { CombinatorSchemaProperties, ConnectionTargetType, NodeSchema } from "../types";
+import { NodeParamsUpdateChanges } from "../../generator/nodes/types"
+import { CombinatorSchemaProperties, ConnectionTargetType, NodeSchema } from "../../generator/types";
 import styles from "./combinator-node-properties.module.scss";
 
 export class CombinatorNodeProperties extends Component{

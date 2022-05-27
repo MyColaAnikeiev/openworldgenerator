@@ -2,7 +2,7 @@ import { debounce, filter, interval, map, Observable, startWith, Subject } from 
 import { 
     NodeWeightPair, 
     NoiseCombine, 
-    NoiseCombineWeighted } from "../../generator/noise-combination-operators";
+    NoiseCombineWeighted } from "./nodes/noise-combination-operators";
 
 import { 
     NoiseBinaryFilterFactory, 
@@ -10,11 +10,10 @@ import {
     NoiseFilter, 
     NoiseLimiterFilterFactory, 
     NoiseScaleFilterFactory, 
-    NoiseSmoothLimiterFilterFactory} from "../../generator/noise-filter-operators";
+    NoiseSmoothLimiterFilterFactory} from "./nodes/noise-filter-operators";
 
-import { GeneratorNode } from "../../generator/generator-node"
-import { PerlinNoise } from "../../generator/perlin-noise";
-import { NodeParamsUpdateChanges } from "../../generator/types";
+import { GeneratorNode } from "./nodes/generator-node"
+import { PerlinNoise } from "./nodes/perlin-noise";
 import { getImageFromGeneratorNode } from "./tools";
 
 import { 
@@ -26,9 +25,10 @@ import {
     NodeSchemaSubtype, 
     NodeSchemaType 
 } from "./types"
-import { SimpleNoiseGenerator, SimpleNoiseGenerator2 } from "../../generator/simple-noise";
-import { VoronoiGenerator } from "../../generator/voronoi-source";
-import { SimplexNoise } from "../../generator/simplex-noise";
+import { SimpleNoiseGenerator, SimpleNoiseGenerator2 } from "./nodes/simple-noise";
+import { VoronoiGenerator } from "./nodes/voronoi-source";
+import { SimplexNoise } from "./nodes/simplex-noise";
+import { NodeParamsUpdateChanges } from "./nodes/types";
 
 
 

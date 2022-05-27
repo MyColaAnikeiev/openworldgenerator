@@ -1,7 +1,7 @@
-import { Component, MouseEvent, MouseEventHandler } from "react"
+import { Component, MouseEvent } from "react"
 import { delay, Observable, Subject, takeUntil } from "rxjs";
-import { NodeParamsUpdateChanges } from "../../../generator/types";
-import { ConnectionTargetType, NodeSchema, SourceSchemaProperties } from "../types"
+import { NodeParamsUpdateChanges } from "../../generator/nodes/types";
+import { ConnectionTargetType, NodeSchema } from "../../generator/types"
 import { CombinatorNodeProperties } from "./combinator-node-properties";
 import { FilterNodeProperties } from "./filter-node-properties";
 import styles from './generator-node.module.scss';

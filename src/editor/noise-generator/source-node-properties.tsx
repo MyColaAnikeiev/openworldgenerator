@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { NodeParamsUpdateChanges } from "../../../generator/types";
-import { NodeSchema, SourceSchemaProperties } from "../types";
+import { NodeParamsUpdateChanges } from "../../generator/nodes/types";
+import { NodeSchema, SourceSchemaProperties } from "../../generator/types";
 
 import styles from "./source-node-properties.module.scss";
 

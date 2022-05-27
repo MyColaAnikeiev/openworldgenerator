@@ -1,4 +1,4 @@
-import { GeneratorNode } from "../../generator/generator-node";
+import { GeneratorNode } from "./nodes/generator-node"
 
 
 export function getImageFromGeneratorNode(

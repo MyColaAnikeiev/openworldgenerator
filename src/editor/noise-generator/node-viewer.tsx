@@ -1,6 +1,6 @@
 import { Component, MouseEvent } from "react";
-import { delay, delayWhen, interval, Observable, of, startWith, Subject, takeUntil } from "rxjs";
-import { GeneratorNode } from "../../../generator/generator-node";
+import { Observable, Subject, takeUntil } from "rxjs";
+import { GeneratorNode } from "../../generator/nodes/generator-node";
 import styles from "./node-viewer.module.scss";
 
 type PropertiesType = {

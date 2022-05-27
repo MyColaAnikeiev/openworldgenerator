@@ -1,51 +1,59 @@
-import { GeneratorNode } from "./generator-node";
+export type NodeSchemaType = 'source' | 'combinator' | 'filter';
 
-export interface NodeParamsUpdateChanges{
-    /* Source */
-    seed?: number;
-    size?: number;
+export type NodeSchemaSubtype = 
+    // Generators    
+        'perlin' | 'simple-noise' | 'simple-noise2' | 'voronoi' | "cellular" | "simplex" |
+    // Combinators
+        'combinator' | 'weighted-combinator' |
+    // Filters
+        "scale" | "dynamic-scale" | "binary" | "limit" | "smooth-limit";
+ 
 
-    /* Combinator */
-    numOfInputs?: number;
-    weight?: {
-        index: number;
-        value: number;
-    }
+export type SourceSchemaProperties = {
+    size: number,
+    seed: number
+};
 
-    /** Filters **/
-    
-    // Scale filter
-    scale?: number;
-    add?: number
+export type CombinatorSchemaProperties = {
+    numOfInputs: number;
+    weights?: number[];
+};
 
-    // Binary filter
-    threshold?: number;
-    upperValue?: number;
-    lowerValue?: number;
+export type NoiseFilterType = "scale" | "dynamic-scale" | "binary";
 
-    // Limiter
-    maxValue?: number,
-    minValue?: number,
-    smoothness?: number
-}
-
-export type FilterParams = { 
-    // Scale filter
+export type NodeSchemaProperties = {
+    size?: number,
+    seed?: number,
+    numOfInputs?: number,
+    weights?: number[],
     scale?: number,
     add?: number,
-
-    // Binary filter
     threshold?: number
     upperValue?: number,
-    lowerValue?: number
-
-    // Dynamic scale
-    controlNode?: GeneratorNode
-    
-    // Limiter
+    lowerValue?: number,
     maxValue?: number,
     minValue?: number,
     smoothness?: number
 }
 
-export type FilterFactory = (node: GeneratorNode, params: FilterParams) => ((x: number, y:number) => number)
+export interface NodeSchema{ 
+    id: number,
+    name?: string,
+    previewOn: boolean,
+    type: NodeSchemaType,
+    subtype: NodeSchemaSubtype,
+    position: {
+        top: number,
+        left: number
+    },
+    properties: NodeSchemaProperties
+}
+
+export type ConnectionTargetType = "default" | "scale-filter.control";
+
+export type NodeConnection = {
+    idTo: number,
+    idFrom: number,
+    targetType: ConnectionTargetType,
+    targetEntryNumber?: number
+}

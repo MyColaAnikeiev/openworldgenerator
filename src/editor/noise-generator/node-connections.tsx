@@ -1,6 +1,6 @@
 import { Component, MouseEvent } from "react";
-import { NodeTreeBuilder } from "../node-tree-generator";
-import { NodeConnection, NodeSchema } from "../types";
+import { NodeTreeBuilder } from "../../generator/node-tree-generator";
+import { NodeConnection } from "../../generator/types";
 import styles from "./node-connections.module.scss";
 
 
