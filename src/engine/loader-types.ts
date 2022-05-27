@@ -1,3 +1,4 @@
+import { NodeTreeSnapshot } from "../generator/types"
 import { Orientation, PlanePosition } from "./types"
 
 
@@ -64,4 +65,11 @@ export type TerrainManagerParams = {
 
 export type TerreinManagerDescription = {
     params: TerrainManagerParams
+}
+
+export type EnginePreset = {
+    nodeTreeSnapshot: NodeTreeSnapshot,
+    scene: EngineSceneParams,
+    terrainManager: TerrainManagerParams,
+    objectDescriptions: EngineOjectsDescription
 }
