@@ -1,5 +1,5 @@
 import { MeshBasicMaterial, MeshLambertMaterial, Scene } from "three";
-import { NodeTreeUser } from "../editor/noise-generator/node-tree-generator";
+import { NodeTreeUser } from "../generator/node-tree-generator";
 import { TerrainChunkManager } from "./chunk-manager/terrain-chunck-manager";
 import { EngineLoader } from "./engine-loader";
 import { TerrainManagerParams } from "./loader-types";

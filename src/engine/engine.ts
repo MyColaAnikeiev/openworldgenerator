@@ -1,4 +1,4 @@
-import { GeneratorNodeTree } from "../editor/noise-generator/node-tree-generator";
+import { GeneratorNodeTree } from "../generator/node-tree-generator";
 import { EngineLoader } from "./engine-loader";
 import { EngineObjects } from "./engine-objects";
 import { EngineScene } from "./engine-scene";
