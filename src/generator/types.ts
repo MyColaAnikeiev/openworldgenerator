@@ -57,3 +57,8 @@ export type NodeConnection = {
     targetType: ConnectionTargetType,
     targetEntryNumber?: number
 }
+
+export type NodeTreeSnapshot = {
+    nodes: NodeSchema[],
+    connections: NodeConnection[]
+}

@@ -23,7 +23,8 @@ import {
     NodeSchema, 
     NodeSchemaProperties, 
     NodeSchemaSubtype, 
-    NodeSchemaType 
+    NodeSchemaType, 
+    NodeTreeSnapshot
 } from "./types"
 import { SimpleNoiseGenerator, SimpleNoiseGenerator2 } from "./nodes/simple-noise";
 import { VoronoiGenerator } from "./nodes/voronoi-source";
@@ -51,19 +52,35 @@ export interface NodeTreeBuilder{
 
 export interface NodeTreeUser{
     getNodeInstance(id: number): GeneratorNode | null;
+    /** 
+     * Stream will emit GeneratorNode (could be the same object or `null`) when 
+     * node with provided `id` could have changed.
+     */
     getNodeInstance$(id: number): Observable<GeneratorNode | null>;
+
     getNodeSchemas(): NodeSchema[];
+    
     getNodeConnections(): NodeConnection[];
+
+    /**
+     * Returns deep copy of current node and connection parameters.
+     */
+    getNodeTreeSnapshot(): NodeTreeSnapshot;
 }
 
 export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
+
+    private nodeSchemas: NodeSchema[]; 
+    private connections: NodeConnection[];
 
     private nodes: Map<number, GeneratorNode> = new Map();
 
     public updated$: Subject<number> = new Subject();
 
-    constructor(private nodeSchemas: NodeSchema[], private connections: NodeConnection[]){
-    }
+    constructor(private nodeTree : NodeTreeSnapshot){
+        this.nodeSchemas = nodeTree.nodes;
+        this.connections = nodeTree.connections;
+    }   
 
 
     addNode(
@@ -254,6 +271,17 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
     getNodeConnections(): NodeConnection[]{
         return this.connections;
     } 
+
+
+    /**
+     * Returns deep copy of current node and connection parameters.
+     */
+    getNodeTreeSnapshot(): NodeTreeSnapshot {
+        return {
+            nodes: this.nodeSchemas.map(node => ({...node})),
+            connections: this.connections.map(conn => ({...conn}))
+        }    
+    }
 
 
     /**
