@@ -89,4 +89,8 @@ export class EngineObjects{
         this.camera.step();
     }
 
+    /* Free resources. */
+    public dispose(){
+        this.entityControllers.forEach(cnt =>  cnt.deactivateController());
+    }
 }
