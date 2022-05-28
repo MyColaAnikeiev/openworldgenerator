@@ -518,4 +518,10 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
         return instance;
     }
 
+    /**
+     * To avoid any potential memoty leaks.
+     */
+    public dispose(){
+        this.updated$.complete();
+    }
 }
