@@ -104,6 +104,22 @@ export class EngineScene{
         return this.scene;
     }
 
+
+    public getRenderingCanvas(): HTMLCanvasElement{
+        return this.renderer.domElement;
+    }
+
+    /**
+     * Will move rendering canvas to new parent.
+     */
+    public changeHostElement(element: HTMLElement): void{
+        this.hostElement.removeChild(this.getRenderingCanvas());
+        this.hostElement = element;
+        element.appendChild(this.getRenderingCanvas());
+
+        this.resetSizes();
+    }
+
     public render(camera: Camera){
         this.renderer.render(this.scene, camera.getCamera());
     }

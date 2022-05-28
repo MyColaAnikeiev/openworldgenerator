@@ -53,8 +53,9 @@ export class EngineObjects{
                         break;
                     }
 
+                    const canvas = this.hostEngine.getEngineScene().getRenderingCanvas();
                     this.entityControllers.push(
-                        new ViewController(this.hostEngine.getDomElement(), targetEntity)
+                        new ViewController(canvas, targetEntity)
                     )
                     break;
             }

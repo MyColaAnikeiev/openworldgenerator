@@ -5,10 +5,23 @@ import { EngineScene } from "./engine-scene";
 import { TerrainManager } from "./terrain-manager";
 
 export interface EngineControllerInterface{
+    /**
+     * Start main loop.
+     */
     start(): void;
-
+    /**
+     * Stop (pause engine) main loop.
+     */
     stop(): void;
 
+    /**
+     * Change container element for rendering canvas.
+     */
+    changeHostElement(container: HTMLElement): void;
+
+    /**
+     * Free resurces.
+     */
     dispose(): void;
 }
 
@@ -88,8 +101,14 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
         return this.terrainManager;
     }
 
+    public changeHostElement(element: HTMLElement): void {
+        this.hostDomElement = element;
+        this.getEngineScene().changeHostElement(element);
+    }
 
     public dispose(): void{
+        this.stop();
+
         this.engineScene.dispose();
         this.objects.dispose();
         this.terrainManager.dispose();
@@ -114,4 +133,5 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
 
         this.animationRequestId = requestAnimationFrame(this.loop.bind(this));
     }
+
 }
