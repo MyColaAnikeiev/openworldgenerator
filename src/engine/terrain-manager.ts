@@ -44,6 +44,10 @@ export class TerrainManager{
         /* See what changed and update it. */
     }
 
+    public getParams(): TerrainManagerParams {
+        return this.params;
+    }
+
     /**
      * Returns height on terrain plane at provided plane coordinates.
      */
