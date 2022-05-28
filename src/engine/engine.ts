@@ -8,7 +8,7 @@ export interface EngineControllerInterface{
     start(): void;
 
     stop(): void;
-    
+
     dispose(): void;
 }
 
@@ -30,6 +30,7 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
     private hostDomElement: HTMLElement;
     private nodeTree: GeneratorNodeTree;
 
+    // This are objects owned and managed by engine.
     private engineScene: EngineScene;
     private objects: EngineObjects;
     private terrainManager: TerrainManager;
@@ -90,6 +91,8 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
 
     public dispose(): void{
         this.engineScene.dispose();
+        this.objects.dispose();
+        this.terrainManager.dispose();
     }
 
     private init(): void{        
