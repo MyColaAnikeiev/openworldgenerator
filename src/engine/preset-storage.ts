@@ -1,13 +1,66 @@
 import { NodeTreeSnapshot } from "../generator/types";
 import { defaultPreset } from "./default-preset";
+import { EngineUserInterface } from "./engine";
 import { EngineLoader } from "./engine-loader";
 import { EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
 
+export interface PresetStorageManager{
 
-export class PresetStorage implements EngineLoader{
+    /**
+     * @returns array of preset names that are stored in browser local storage.
+     */
+    getPresetList(): string[];
+
+
+
+    // Methods influencing class inner state (parameters and current presetName):
+
+    /**
+     * Loads preset from browser storage using provided `name`.
+     */
+    selectPreset(name: string): void;
+
+    /**
+     * Change name for currently loaded params.
+     * Useful when you want to save copy of loaded preset with different name.
+     */
+    renameCurrentPreset(newName: string): void;
+
+     /**
+     * Extracts parameters from provided `engine` and update with it inner class state. 
+     * To save it to browser storage call `savePreset()`.
+     */
+    extractParams(engine: EngineUserInterface): void;
+
+
+
+    // Methods only influencing browser local storage:
+
+    /**
+     * Save currently loaded preset parameters to curently selected name in browser local storage.
+     */
+    savePreset(): void;
+
+    /**
+     * Renames preset in browser storage. Currently loaded preset prarams and name won't be changed.
+     */
+    renamePreset(oldName: string, newName: string): void;
+
+    /**
+     * Removes preset from browser storage. Currently loaded preset prarams and name won't be changed.
+     */
+    removePreset(name: string): void;
+}
+
+export class PresetStorage implements EngineLoader,PresetStorageManager{
 
     private currentPreset: EnginePreset = defaultPreset;
+    private curPresetName: string = 'default';
 
+    /**
+     * If `presetName` is `null` then last selected preset name will be used, or
+     * default if there isn't any.
+     */
     constructor(presetName: string | null){
         if(presetName === null){
             this.loadLastSelected();
@@ -49,17 +102,115 @@ export class PresetStorage implements EngineLoader{
         return list;
     }
 
-    private loadLastSelected(){
+    /**
+     * Loads preset from browser storage.
+     */
+    public selectPreset(name: string): void{
+        this.loadPreset(name);
+    }
+
+    /**
+     * Save currently loaded preset parameters to curently selected name in browser local storage.
+     */
+    public savePreset(): void{
+        
+        if(this.curPresetName == "default"){
+            let ind = 0;
+            while (true){
+                if(globalThis.localStorage.getItem("default_" + String(ind))){
+                    ind++;
+                }else{
+                    break;
+                }
+            }
+
+            this.curPresetName = "default_" + String(ind);
+        }
+
+        this.addPresetName(this.curPresetName);
+        globalThis.localStorage.setItem("preset_" + this.curPresetName, JSON.stringify(this.currentPreset));
+    }
+
+    /**
+     * Change name for currently loaded params but without affecting browser storage.
+     * Useful when you want to save copy of loaded preset with different name.
+     */
+    public renameCurrentPreset(newName: string): void{
+        this.curPresetName = newName;
+    }
+
+    /**
+     * Renames preset in browser storage. Currently loaded preset prarams and name won't be changed.
+     */
+    public renamePreset(oldName: string, newName: string): void{
+        const presetStr = globalThis.localStorage.getItem("preset_"+oldName);
+        if(presetStr === null){
+            return;
+        }
+
+        this.removePreset(oldName);
+        
+        globalThis.localStorage.setItem("preset_" + newName, presetStr);
+        this.addPresetName(newName);
+    }
+
+    /**
+     * Removes preset from browser storage. Currently loaded preset prarams and name won't be changed.
+     */
+    public removePreset(name: string): void{
+        globalThis.localStorage.removeItem("preset_"+name);
+        
+        // Remove from list
+        const listStr = localStorage.getItem("preset_list");
+        if(listStr !== null){
+            let list = JSON.parse(listStr) as string[];
+            list = list.filter(cur => cur != name);
+            globalThis.localStorage.setItem("preset_list", JSON.stringify(list));
+        }
+    }
+    
+    /**
+     * Extracts parameters from provided `engine` and update with it inner class state. 
+     * To save it to browser storage call `savePreset()`.
+     */
+    public extractParams(engine: EngineUserInterface): void{
+        const cur = this.currentPreset;        
+
+        const sceneParms = engine.getEngineScene().getParams();
+        cur.scene = {...cur.scene, ...sceneParms};
+
+        const terrainParams = engine.getTerrainManager().getParams();
+        cur.terrainManager = {...cur.terrainManager, ...terrainParams};
+
+        const nodeTreeSnapshot = engine.getGeneratorNodeTree().getNodeTreeSnapshot()
+        cur.nodeTreeSnapshot = nodeTreeSnapshot;
+    }
+
+    /**
+     * Adds preset name to preset list.
+     */
+    private addPresetName(name: string): void{
+        const listStr = globalThis.localStorage.getItem("preset_list");
+        let list = [];
+        if(listStr !== null){
+            list = JSON.parse(listStr);
+        }
+
+        const exist = list.some(cur => cur == name);
+        if(!exist){
+            list.push(name);
+        }
+        
+        globalThis.localStorage.setItem("preset_list", JSON.stringify(list));
+    }
+
+    private loadLastSelected(): void{
         const lastSelected = globalThis.localStorage.getItem("last_selected");
         this.loadPreset(lastSelected);
     }
     
-    /**
-     * Loads defaults if not found.
-     */
-    private loadPreset(name: string){
-        this.currentPreset = defaultPreset;
 
+    private loadPreset(name: string): void{
         const presetStr = globalThis.localStorage.getItem("preset_" + name);
 
         if(presetStr === null){
@@ -74,7 +225,9 @@ export class PresetStorage implements EngineLoader{
             return;
         }
 
+        this.curPresetName = name;
         globalThis.localStorage.setItem("last_selected", name);
         this.currentPreset = preset;
     }
+
 }
