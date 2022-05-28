@@ -413,4 +413,14 @@ export abstract class BaseChunkManager{
         })
     }
 
+    public dispose(){
+        this.chunks.forEach(chunkRow => {
+            chunkRow.forEach(chunk => this.freeChunk(chunk));
+        })
+
+        this.genTaskQueue.forEach(ch => this.cleanIntermediateResultsOfgenTask(ch) );
+        this.genTaskQueue = [];
+
+        this.contentUpdateTaskQueue = [];
+    }
 }

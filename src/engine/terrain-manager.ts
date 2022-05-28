@@ -57,7 +57,6 @@ export class TerrainManager{
      */
     public dispose(){
         this.terrainMaterial.dispose();
-
-        // Dispose of chunks in chunkManager here.
+        this.chunkManager.dispose();
     }
 }
