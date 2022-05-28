@@ -4,8 +4,26 @@ import { EngineObjects } from "./engine-objects";
 import { EngineScene } from "./engine-scene";
 import { TerrainManager } from "./terrain-manager";
 
+export interface EngineControllerInterface{
+    start(): void;
 
-export class Engine{
+    stop(): void;
+    
+    dispose(): void;
+}
+
+export interface EngineUserInterface{
+ 
+    getDomElement(): HTMLElement;
+    
+    getEngineScene(): EngineScene;
+ 
+    getGeneratorNodeTree(): GeneratorNodeTree;
+ 
+    getTerrainManager(): TerrainManager;
+}
+
+export class Engine implements EngineControllerInterface, EngineUserInterface{
 
     private loader: EngineLoader;
 
@@ -32,7 +50,7 @@ export class Engine{
         this.init();
     }
 
-    public start(){
+    public start(): void{
         if(this.running){
             this.stop();
         }
@@ -41,7 +59,7 @@ export class Engine{
         this.loop();
     }
 
-    public stop(){
+    public stop(): void{
         if(this.running){
             this.running = false;
             cancelAnimationFrame(this.animationRequestId);
@@ -75,8 +93,8 @@ export class Engine{
     }
 
     private init(): void{        
-        this.engineScene = new EngineScene(this.hostDomElement, this.loader);
-        this.terrainManager = new TerrainManager(this.engineScene.getScene(), this.nodeTree, this.loader);
+        this.engineScene = new EngineScene(this.getDomElement(), this.loader);
+        this.terrainManager = new TerrainManager(this.engineScene.getScene(), this.getGeneratorNodeTree(), this.loader);
         this.objects = new EngineObjects(this, this.loader);
     }
 

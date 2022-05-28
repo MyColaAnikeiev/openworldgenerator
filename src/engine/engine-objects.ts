@@ -2,7 +2,7 @@ import { Camera } from "./cameras/camera";
 import { ViewCamera } from "./cameras/view-camera";
 import { EntityController } from "./controlls/controller";
 import { ViewController } from "./controlls/view-controller";
-import { Engine } from "./engine";
+import { EngineUserInterface } from "./engine";
 import { EngineLoader } from "./engine-loader";
 import { Entity } from "./entities/entity";
 import { ViewEntity } from "./entities/view-entity";
@@ -17,7 +17,7 @@ export class EngineObjects{
     
     private objectDescroptions: EngineOjectsDescription;
 
-    constructor(private hostEngine: Engine, private loader: EngineLoader){
+    constructor(private hostEngine: EngineUserInterface, private loader: EngineLoader){
         this.objectDescroptions = this.loader.getObjectDescription();
 
         this.instantiateEntities();

@@ -1,4 +1,4 @@
-import { Engine } from "../engine";
+import { EngineUserInterface } from "../engine";
 import { EngineObjects } from "../engine-objects";
 import { Orientation, PlanePosition, Position } from "../types";
 import { Entity } from "./entity";
@@ -11,7 +11,7 @@ export class ViewEntity extends Entity{
 
     private viewHeight = 0.0;
     
-    constructor(id: number, hostEngine: Engine, engineObjects: EngineObjects, pos: PlanePosition, orientaion: Orientation){
+    constructor(id: number, hostEngine: EngineUserInterface, engineObjects: EngineObjects, pos: PlanePosition, orientaion: Orientation){
         const height = 0.0;
         super(id, hostEngine, engineObjects, {...pos, height}, orientaion);
     }

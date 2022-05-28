@@ -1,4 +1,4 @@
-import { Engine } from "../engine";
+import { EngineUserInterface } from "../engine";
 import { EngineObjects } from "../engine-objects";
 import { Orientation, Position } from "../types";
 
@@ -7,7 +7,7 @@ export abstract class Entity{
     
     constructor(
         public readonly id: number,
-        protected hostEngine: Engine,
+        protected hostEngine: EngineUserInterface,
         protected engineObjects: EngineObjects,
         protected position: Position, 
         protected orientation: Orientation
