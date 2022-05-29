@@ -4,21 +4,30 @@ import { EngineUserInterface } from "./engine";
 import { EngineLoader } from "./engine-loader";
 import { EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
 
+
 export interface PresetStorageManager{
 
     /**
-     * @returns array of preset names that are stored in browser local storage.
+     * Returns array of preset names that are stored in browser local storage.
      */
     getPresetList(): string[];
 
-
+    /**
+     * Get current preset name on which storage manager is working.
+     */
     getCurrentPresetName(): string;
+
+    /**
+     * Get current preset on which storage manager is working.
+     */
+    getCurrentPreset(): EnginePreset;
+
 
 
     // Methods influencing class inner state (parameters and current presetName):
 
     /**
-     * Loads preset from browser storage using provided `name`.
+     * Loads preset from browser storage using provided preset `name`.
      */
     selectPreset(name: string): void;
 
@@ -34,12 +43,21 @@ export interface PresetStorageManager{
      */
     extractParams(engine: EngineUserInterface): void;
 
+    /**
+     * Sets current preset and preset name to manager inner state.
+     */
+    setCurrentPreset(name: string, preset: EnginePreset): void;
+
 
 
     // Methods only influencing browser local storage:
 
     /**
      * Save currently loaded preset parameters to curently selected name in browser local storage.
+     * If in browser local storage exits preset with name equal to currently selected name, then
+     * it will be overwriten. If you want to create a copy or save both original and modified 
+     * presets then change currently selected name to something else with `renameCurrentPreset()`
+     * before saving.
      */
     savePreset(): void;
 
@@ -108,6 +126,10 @@ export class PresetStorage implements EngineLoader,PresetStorageManager{
         return this.curPresetName;
     }
 
+    getCurrentPreset(): EnginePreset {
+        return this.currentPreset;
+    }
+
     /**
      * Loads preset from browser storage.
      */
@@ -173,6 +195,11 @@ export class PresetStorage implements EngineLoader,PresetStorageManager{
             list = list.filter(cur => cur != name);
             globalThis.localStorage.setItem("preset_list", JSON.stringify(list));
         }
+    }
+
+    setCurrentPreset(name: string, preset: EnginePreset): void {
+        this.curPresetName = name;
+        this.currentPreset = preset;
     }
     
     /**
