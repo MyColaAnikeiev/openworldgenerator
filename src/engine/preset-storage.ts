@@ -12,6 +12,8 @@ export interface PresetStorageManager{
     getPresetList(): string[];
 
 
+    getCurrentPresetName(): string;
+
 
     // Methods influencing class inner state (parameters and current presetName):
 
@@ -100,6 +102,10 @@ export class PresetStorage implements EngineLoader,PresetStorageManager{
         }
 
         return list;
+    }
+
+    getCurrentPresetName(): string {
+        return this.curPresetName;
     }
 
     /**
