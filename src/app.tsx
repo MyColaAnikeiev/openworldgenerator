@@ -3,6 +3,7 @@ import { Demonstration } from "./demonstration/demonstration";
 import { Editor } from "./editor/editor";
 import { EngineManager } from "./engine-manager";
 
+import style from "./app.module.scss"
 
 type AppProps = {
 }
@@ -40,7 +41,7 @@ export class App extends Component{
         }
 
         return (
-            <div className="app-container">
+            <div className={style["app-container"]}>
 
                 { 
                     this.state.displaying == "demonstration" 

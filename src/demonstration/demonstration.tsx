@@ -2,6 +2,8 @@ import { Component } from "react";
 import { EngineManager } from "../engine-manager";
 import { Menu } from "./menu/menu";
 
+import styles from "./demonstration.module.scss"
+
 type Props = {
     manager: EngineManager,
     switchToEditorCallback: () => void
@@ -31,10 +33,10 @@ export class Demonstration extends Component{
         }
 
         return (
-            <div className="demonstration">
+            <div className={styles["demonstration"]}>
 
                 <div 
-                    className="canvas-container"
+                    className={styles["canvas-container"]}
                     ref={ref}
                 ></div>
 
