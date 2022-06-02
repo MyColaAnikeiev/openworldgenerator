@@ -1,0 +1,23 @@
+.preset{
+    display: grid;
+    grid-template: 1fr/1fr 65px 105px 38px;
+    gap: 2px;
+    background-color: #e3e1e1;
+    margin: 3px;
+    padding: 4px 4px;
+    border-radius: 4px;
+
+    .title{
+        cursor: pointer;
+    }
+
+    .btn{
+        font-size: 13px;
+        background-color: #2d2b2b;
+        color: rgb(209, 209, 209);
+        text-align: center;
+        padding: 2px 0px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+}
