@@ -1,0 +1,46 @@
+.preset-list{
+
+    &-body{
+        padding: 15px 20px;
+        width: 400px;
+        height: fit-content;
+        background-color: rgba(0, 0, 0, 0.411);
+        border-radius: 3px;
+
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    &-head{
+        color: white;
+        padding-bottom: 5px;
+
+        h3{
+            margin: 0;
+        }
+    }
+
+    &-items{
+        height: 300px;
+        overflow-y: scroll;
+        background-color: rgba(255, 255, 255, 0.377);
+    }
+
+}
+
+
+
+.foot-controls{
+    display: flex;
+    flex-wrap: wrap;
+
+    .btn{
+        margin-top: 10px;
+        margin-right: 10px;
+        padding: 4px 12px;
+        background-color: black;
+        color: rgb(204, 204, 204);
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+}
