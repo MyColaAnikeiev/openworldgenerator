@@ -1,0 +1,27 @@
+
+.main-menu{
+
+    &-body{
+        padding: 20px;
+        width: 320px;
+        height: fit-content;
+        background-color: rgba(0, 0, 0, 0.116);
+        border-radius: 3px;
+    }
+
+
+    &-entry{
+        padding: 4px 12px;
+        border: 1px solid rgb(58, 58, 58);
+        background-color: rgb(34, 34, 34);
+        border-radius: 4px;
+        margin-bottom: 15px;
+        color: rgb(235, 235, 235);
+        font-size: 27px;
+        font-weight: 800;
+        font-family: 'Courier New', Courier, monospace;
+
+        cursor: pointer;
+    }
+
+}
