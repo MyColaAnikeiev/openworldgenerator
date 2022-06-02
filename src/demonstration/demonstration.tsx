@@ -17,12 +17,21 @@ export class Demonstration extends Component{
         menuOn: boolean;
     }
 
+    keydownHandler: (evt: KeyboardEvent) => void;
+
     constructor(props: Props){
         super(props);
 
         this.state = {
             menuOn: true
         }
+
+        this.keydownHandler = (evt: KeyboardEvent) => {
+            if(evt.key == "Escape" && !this.state.menuOn){
+                this.setState({menuOn: true});
+            }
+        }
+        globalThis.window.addEventListener("keydown",this.keydownHandler);
     }
 
     render(){
@@ -31,6 +40,8 @@ export class Demonstration extends Component{
                 this.props.manager.setEngineCanvasContainer(elm);
             }
         }
+
+        const closeMenu = () => this.setState({ menuOn: false });
 
         return (
             <div className={styles["demonstration"]}>
@@ -43,10 +54,18 @@ export class Demonstration extends Component{
                 { 
                   this.state.menuOn 
                     && 
-                  <Menu engineManager={this.props.manager} /> 
+                  <Menu 
+                    closeSelfCallback={closeMenu}
+                    engineManager={this.props.manager} 
+                    switchToEditorCallback={this.props.switchToEditorCallback} 
+                  /> 
                 }
 
             </div>
         )
+    }
+
+    componentWillUnmount(){
+        globalThis.window.removeEventListener("keydown",this.keydownHandler);
     }
 } 
