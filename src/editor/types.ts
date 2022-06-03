@@ -1,0 +1,1 @@
+export type EditorType = "node-editor" | "scene-editor" | "terrain-editor";
