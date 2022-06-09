@@ -1,0 +1,25 @@
+.popup-picker-body{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 200px;
+    background-color: rgb(117, 117, 117);
+    border: 1px solid rgb(57, 57, 57);
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 14px 6px;
+
+    .popup-picker-color-indicator{
+        width: 80px;
+        height: 30px;
+        border: 1px solid gray;
+        border-radius: 5px;
+    }
+
+    label{
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 15px;
+        color: white;
+    }
+}
