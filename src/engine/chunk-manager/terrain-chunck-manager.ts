@@ -44,6 +44,25 @@ export class TerrainChunkManager extends BaseChunkManager{
         }
     }
 
+    /**
+     * Updates terrain heightMap source and triggers chunks update.  
+     */
+    setNoiseSource(gen: GeneratorNode, gen$: Observable<GeneratorNode>): void{
+        this.noiseGenerator = gen;
+        this.noiseGenerator$ = gen$;
+        this.setChunksAsToBeReplaced();
+        this.updateChunks();
+    }
+
+    /**
+     * Updates chunks resolutions. 
+     */
+    setTerrainResolution(newResolution: number): void{
+        this.terrainResolution = newResolution;
+        this.setChunksAsToBeReplaced();
+        this.updateChunks();
+    }
+
 
     /**
      * Assign an optimization level depending on `round`(distance from central chunk).
