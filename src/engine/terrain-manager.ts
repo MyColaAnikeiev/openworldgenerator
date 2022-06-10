@@ -32,7 +32,7 @@ export class TerrainManager{
             nodeTree.getNodeInstance$(params.sourceNodeId), 
             params.terrainResolution, this.terrainMaterial
         )
-
+        console.log(this)
     }
 
     public setViewPosition(pos: PlanePosition){
@@ -42,6 +42,25 @@ export class TerrainManager{
 
     public setParams(params: TerrainManagerParams){
         /* See what changed and update it. */
+        if("chunkSize" in params){
+            this.chunkManager.setChunkSize(Math.max(1,params.chunkSize));
+        }
+        if("hysteresis" in params){
+            this.chunkManager.setHysteresis(Math.max(0,params.hysteresis));
+        }
+        if("rounds" in params){
+            this.chunkManager.setRounds(Math.max(0,params.rounds));
+        }
+        if("terrainResolution" in params){
+            this.chunkManager.setTerrainResolution(Math.max(1,params.terrainResolution));
+        }
+        if("sourceNodeId" in params){
+            const gen = this.nodeTree.getNodeInstance(params.sourceNodeId);
+            const gen$ = this.nodeTree.getNodeInstance$(params.sourceNodeId);
+            this.chunkManager.setNoiseSource(gen, gen$);
+        }
+
+        this.params = {...this.params, ...params};
     }
 
     public getParams(): TerrainManagerParams {
