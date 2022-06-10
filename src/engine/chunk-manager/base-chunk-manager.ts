@@ -104,7 +104,85 @@ export abstract class BaseChunkManager{
             }
         }
     }
+
+    /**
+     *  Updates hysteresis which desides when chunk is to be disposed and when chunk is to be created.   
+     */
+    public setHysteresis(hysteresis: number): void{
+        this.hysteresis = hysteresis;
+    }
     
+    /**
+     * Updates chunk size. All previously created chunks will be disposed.
+     */
+    public setChunkSize(newSize: number): void{
+        this.dispose();
+        this.chunkSize = newSize;
+        this.setViewPosition(this.viewPosition);
+        this.updateChunks();
+    }
+
+
+    /**
+     * Clears all unused chunks and sets one that are used as toBeReplaced, so they will
+     * be replaced after next update.
+     */
+    protected setChunksAsToBeReplaced(){
+        this.chunks.forEach(row => {
+            row.forEach(chunkArea => {
+                chunkArea.instances = chunkArea.instances.filter(inst => {
+                    if(inst.state !== ChunkReadyState.used){
+                        this.freeChunkInstance(inst);
+                        return false;
+                    }else{
+                        inst.state = ChunkReadyState.toBeReplaced;
+                        return true;
+                    }
+                })
+            })
+        })
+    }
+
+    
+    /**
+     * Updates number of rounds around middle chunks that chunk manager will be generating.
+     */
+    public setRounds(rounds: number): void{
+        if(this.rounds > rounds)
+        {
+            const diff = this.rounds - rounds;
+            const oSize = 1+2*this.rounds
+            const newChunksGrid = this.getEmptyChunkGrid(rounds);
+
+            for(let y = 0; y < oSize; y++){
+                for(let x = 0; x < oSize; x++){
+                    if(y < diff || x < diff || x >= oSize-diff || y >= oSize-diff){
+                        this.freeChunk(this.chunks[y][x]);
+                    }else{
+                        newChunksGrid[y-diff][x-diff] = this.chunks[y][x]
+                    }
+                }
+            }
+
+            this.chunks = newChunksGrid;
+            this.rounds = rounds;
+        }
+        else if(rounds > this.rounds)
+        {
+            const diff = rounds - this.rounds;
+            const oSize = 1+2*this.rounds
+            const newChunksGrid = this.getEmptyChunkGrid(rounds);
+            for(let y = 0; y < oSize; y++){
+                for(let x = 0; x < oSize; x++){
+                    newChunksGrid[y+diff][x+diff] = this.chunks[y][x];
+                }
+            }
+
+            this.chunks = newChunksGrid;
+            this.rounds = rounds;
+            this.updateChunks();
+        }
+    }
 
     /**
      * When view position is changed enough to trigger update, this function manages
@@ -114,7 +192,7 @@ export abstract class BaseChunkManager{
      * 3d secene until new instance is generated. Deleting and swapping is done during
      * current script event run. Generation is done asynchronously by task runner.
      */
-    private updateChunks(){
+    protected updateChunks(){
         this.updateChunksTimeoutId = null;
 
         const gridSize = this.rounds*2 + 1;
@@ -240,21 +318,24 @@ export abstract class BaseChunkManager{
         this.triggerTaskRunner();
     }
 
-
-    private freeChunk(chunck: ChunkArea){
+    
+    private freeChunk(chunck: ChunkArea): void{
         chunck.instances.forEach(instance => {
-            if(instance.state === ChunkReadyState.used){
-                this.scene.remove(instance.object3D)
-            }
-            if(instance.state === ChunkReadyState.pending){
-                instance.state = ChunkReadyState.stoped;
-            }
-            if(instance.object3D){
-                this.disposeOfChunkObject(instance.object3D);
-            }
+            this.freeChunkInstance(instance);
         });
     }
-    
+
+    private freeChunkInstance(inst: ChunkInstance): void{
+        if(inst.state === ChunkReadyState.used || inst.state === ChunkReadyState.toBeReplaced){
+            this.scene.remove(inst.object3D);
+        }
+
+        if(inst.object3D){
+            this.disposeOfChunkObject(inst.object3D);
+        }
+
+        inst.state = ChunkReadyState.stoped;
+    }
 
     /**
      * Change for or request fitting optimization level based on round.
@@ -270,7 +351,7 @@ export abstract class BaseChunkManager{
             return ins.minRound <= round && ins.maxRound >= round;
         })
         
-        if(fittingChunk){
+        if(fittingChunk && fittingChunk.state !== ChunkReadyState.toBeReplaced){
             if(fittingChunk.state === ChunkReadyState.ready){
                 const used = chunkArea.instances.find(ins => ins.state === ChunkReadyState.used);
                 if(used){
@@ -346,6 +427,15 @@ export abstract class BaseChunkManager{
                     used.state = ChunkReadyState.ready;
                 }
 
+                curTask.chunkArea.instances = curTask.chunkArea.instances.filter(inst => {
+                    if(inst.state === ChunkReadyState.toBeReplaced){
+                        this.freeChunkInstance(inst);
+                        return false;
+                    }
+                    return true;
+                })
+
+
                 this.scene.add(mesh);
                 curTask.instance.object3D = mesh;
                 curTask.instance.state = ChunkReadyState.used;
@@ -413,6 +503,9 @@ export abstract class BaseChunkManager{
         })
     }
 
+    /**
+     * Clears chunk manager of all generated chunks and clears task queues.
+     */
     public dispose(){
         this.chunks.forEach(chunkRow => {
             chunkRow.forEach(chunk => this.freeChunk(chunk));
@@ -422,5 +515,14 @@ export abstract class BaseChunkManager{
         this.genTaskQueue = [];
 
         this.contentUpdateTaskQueue = [];
+
+        if(this.taskRunnerTimeoutId){
+            clearTimeout(this.taskRunnerTimeoutId)
+            this.taskRunnerTimeoutId = null
+        }
+        if(this.updateChunksTimeoutId){
+            clearTimeout(this.updateChunksTimeoutId);
+            this.updateChunksTimeoutId = null;
+        }
     }
 }

@@ -5,7 +5,8 @@ export enum ChunkReadyState{
     stoped, // Not generated. Was canceled
     pending, // If not stoped, when finished, generator will set state `used`
     ready, // When it generated but not used.
-    used // When it generated and used
+    used, // When it generated and used
+    toBeReplaced // When it used, but waits to be disposed when new one is generated.
 }
 
 export type ChunkInstance = {
