@@ -1,4 +1,4 @@
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { BufferAttribute, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Scene } from "three";
 import { GeneratorNode } from "../../generator/nodes/generator-node";
 import { PlanePosition } from "../types";
@@ -7,6 +7,8 @@ import { ChunkArea, ChunkGenState, ChunkInstance, ChunkReadyState } from "./type
 
 
 export class TerrainChunkManager extends BaseChunkManager{
+
+    noiseGeneratorSubscription: Subscription;
     
     /**
      * @param scene THREEJS scene object. 
@@ -35,7 +37,7 @@ export class TerrainChunkManager extends BaseChunkManager{
         super(scene, viewPosition, chunkSize, hysteresis, rounds);
 
         if(noiseGenerator$){
-            noiseGenerator$.subscribe(gen => {
+            this.noiseGeneratorSubscription = noiseGenerator$.subscribe(gen => {
                 if(gen){
                     this.noiseGenerator = gen;
                     this.updateChunksContent();
@@ -50,6 +52,18 @@ export class TerrainChunkManager extends BaseChunkManager{
     setNoiseSource(gen: GeneratorNode, gen$: Observable<GeneratorNode>): void{
         this.noiseGenerator = gen;
         this.noiseGenerator$ = gen$;
+        if(this.noiseGeneratorSubscription){
+            this.noiseGeneratorSubscription.unsubscribe();    
+        }
+        if(gen$){
+            this.noiseGeneratorSubscription = gen$.subscribe(gen => {
+                if(gen){
+                    this.noiseGenerator = gen;
+                    this.updateChunksContent();
+                }
+            })
+        }
+
         this.setChunksAsToBeReplaced();
         this.updateChunks();
     }
