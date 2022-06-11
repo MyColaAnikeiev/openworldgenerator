@@ -60,7 +60,9 @@ export type TerrainManagerParams = {
     hysteresis?: number,
     rounds?: number,
     terrainResolution?: number,
-    sourceNodeId?: number
+    sourceNodeId?: number,
+    planeTextureMapSrc?: string,
+    planeTextureSize?: number
 }
 
 export type TerreinManagerDescription = {
