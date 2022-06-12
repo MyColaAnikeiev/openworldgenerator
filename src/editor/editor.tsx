@@ -3,6 +3,7 @@ import { EngineManager } from "../engine-manager";
 
 import styles from "./editor.module.scss";
 import { NodeEditor } from "./noise-generator/node-editor";
+import { TerrainEditor } from "./terrain/terrain-editor";
 import { TopBar } from "./top-bar/top-bar";
 import { TopBarSwitchEntry } from "./top-bar/types";
 import { EditorType } from "./types";
@@ -25,21 +26,26 @@ export class Editor extends Component{
         super(props);
 
         this.state = {
-            editorType: "node-editor"
+            editorType: "scene-editor"
         }
     }
     
     render(){
         const topBarSwitchers: TopBarSwitchEntry[] = [
             {
+                text: "scene",
+                iconSrc:"public/assets/fontawesome/solid/image.svg",
+                action: () => this.setState({editorType: "scene-editor"})
+            },
+            {
                 text: "noise generator",
                 iconSrc:"public/assets/fontawesome/solid/diagram-project.svg",
                 action: () => this.setState({editorType: "node-editor"})
             },
             {
-                text: "scene",
-                iconSrc:"public/assets/fontawesome/solid/image.svg",
-                action: () => this.setState({editorType: "scene-editor"})
+                text: "terrain",
+                iconSrc:"public/assets/fontawesome/solid/earth-africa.svg",
+                action: () => this.setState({editorType: "terrain-editor"})
             } 
         ];
 
@@ -64,10 +70,12 @@ export class Editor extends Component{
         }
 
         switch(this.state.editorType){
-            case "node-editor":
-                return <NodeEditor {...props} />
             case "scene-editor":
                 return null
+            case "node-editor":
+                return <NodeEditor {...props} />
+            case "terrain-editor":
+                return <TerrainEditor {...props}/>
         }
 
         return null;
