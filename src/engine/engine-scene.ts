@@ -1,5 +1,6 @@
 import { AmbientLight, DirectionalLight, Fog, FogBase, FogExp2, Scene, WebGLRenderer } from "three";
 import { Camera } from "./cameras/camera";
+import { Engine } from "./engine";
 import { EngineLoader } from "./engine-loader";
 import { EngineSceneParams } from "./loader-types";
 
@@ -31,7 +32,7 @@ export class EngineScene{
     private resizeHandler: () => void;
     
 
-    constructor(private hostElement: HTMLElement, private loader: EngineLoader){
+    constructor(private hostEngine: Engine, private hostElement: HTMLElement, private loader: EngineLoader){
         this.params = {...defaultParams, ...loader.getEngineSceneParams()};
 
         this.init();
@@ -61,7 +62,7 @@ export class EngineScene{
         if(params.fogType === "linear"){
             this.fog = new Fog(params.fogColor, params.linearFogNear, params.linearFogFar);
         }
-        if(params.fogType === "exponantial"){
+        if(params.fogType === "exponential"){
             this.fog = new FogExp2(params.fogColor, params.exponentialFoxDensity);
         }
         this.scene.fog = this.fog;
@@ -74,17 +75,67 @@ export class EngineScene{
      * Look at which properties was changed and updates scene accordingly.
      */
     public setParams(params: EngineSceneParams){
-        if(this.params.linearFogNear !== params.linearFogNear){
-            if(this.params.fogType === "linear"){
-                const fog = <Fog>this.fog;
-                fog.near = params.linearFogNear;
+        if(params.fogType !== undefined && params.fogType !== this.params.fogType){
+            const tmpParams = {...this.params, ...params}
+
+            switch(params.fogType){
+                case "none":
+                    this.fog = null;
+                    this.scene.fog = null;
+                    break;
+                case "linear":
+                    this.fog = new Fog(tmpParams.fogColor, tmpParams.linearFogNear, tmpParams.linearFogFar);
+                    this.scene.fog = this.fog;
+                    break;
+                case "exponential":
+                    this.fog = new FogExp2(tmpParams.fogColor, tmpParams.exponentialFoxDensity);
+                    this.scene.fog = this.fog;
+                    break;
             }
         }
-        if(this.params.linearFogFar !== params.linearFogFar){
+
+        if(params.linearFogNear !== undefined){
             if(this.params.fogType === "linear"){
-                const fog = <Fog>this.fog;
-                fog.far = params.linearFogFar;
+                (this.fog as Fog).near = params.linearFogNear;
             }
+        }
+
+        if(params.linearFogFar !== undefined){
+            if(this.params.fogType === "linear"){
+                (this.fog as Fog).far = params.linearFogFar;
+            }
+        }
+
+        if(params.fogColor !== undefined){
+            if(this.fog){
+                this.fog.color.set(params.fogColor);
+            }
+        }
+
+        if(params.exponentialFoxDensity !== undefined){
+            if(this.params.fogType === "exponential"){
+                (this.fog as FogExp2).density = params.exponentialFoxDensity;
+            }
+        }
+
+        if(params.sceneClearColor !== undefined){
+            this.renderer.setClearColor(params.sceneClearColor);
+        }
+
+        if(params.ambientLightColor !== undefined){
+            this.ambientLight.color.set(params.ambientLightColor);
+        }
+
+        if(params.ambientLightIntensity !== undefined){
+            this.ambientLight.intensity = params.ambientLightIntensity;
+        }
+
+        if(params.sunLightColor !== undefined){
+            this.sun.color.set(params.sunLightColor);
+        }
+
+        if(params.sunLightIntensity !== undefined){
+            this.sun.intensity = params.sunLightIntensity;
         }
 
         /* And so on ... */
@@ -141,6 +192,10 @@ export class EngineScene{
         const dim = this.hostElement.getBoundingClientRect();
         const width = dim.right - dim.left;
         const height = dim.bottom - dim.top;
+
+        this.hostEngine.getEngineObjects()?.getCamera().setParams({
+            aspect: width / height
+        })
 
         this.renderer.setSize(width, height);
     }
