@@ -3,7 +3,7 @@ import { Orientation, PlanePosition } from "./types"
 
 
 export type EngineSceneParams = {
-    fogType?: 'none' | 'linear' | 'exponantial',
+    fogType?: 'none' | 'linear' | 'exponential',
     fogColor?: number | string,
     linearFogNear?: number,
     linearFogFar?: number,
