@@ -1,11 +1,18 @@
 import { PerspectiveCamera } from "three";
 import { Entity } from "../entities/entity";
 import { Camera } from "./camera";
+import { CameraParameters } from "./types";
 
+const defaultParams: CameraParameters = {
+    aspect: 1,
+    near: 0.5,
+    far: 1500
+}
 
 export class ViewCamera extends Camera{
 
     perspectiveCamera: PerspectiveCamera;
+    params: CameraParameters;
 
     /**
      * @param bindedEntity is an instance that camera will follow.
@@ -13,8 +20,9 @@ export class ViewCamera extends Camera{
     constructor(private bindedEntity: Entity | null){
         super();
 
-        this.perspectiveCamera = new PerspectiveCamera(50,1, 0.1, 1500);
-        this.perspectiveCamera.rotation.order = "ZYX";
+        this.params = {...defaultParams};
+        this.instantiateCamera();
+
         this.step();
     }
 
@@ -48,6 +56,17 @@ export class ViewCamera extends Camera{
         const orientation = this.bindedEntity.getOrientaion();
         this.perspectiveCamera.rotation.x = orientation.vertical;
         this.perspectiveCamera.rotation.y = orientation.horizontal;
+    }
+
+    public setParams(params: CameraParameters): void{
+        this.params = {...this.params, ...params};
+
+        this.instantiateCamera();
+    }
+
+    private instantiateCamera(){
+        this.perspectiveCamera = new PerspectiveCamera(50,this.params.aspect, this.params.near, this.params.far);
+        this.perspectiveCamera.rotation.order = "ZYX";
     }
 
 }

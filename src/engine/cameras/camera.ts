@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "three";
-import { Entity } from "../entities/entity";
+import { CameraParameters } from "./types";
 
 
 export abstract class Camera{
@@ -12,4 +12,10 @@ export abstract class Camera{
      * Trigger cammera update.
      */
     abstract step(): void;
+
+    /**
+     * Takes one or more parameters and apdate camera with it.
+     */
+    abstract setParams(params: CameraParameters): void;
+    
 }
