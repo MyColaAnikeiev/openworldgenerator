@@ -101,5 +101,5 @@ export function fromMColorParamsToHex(color: MColor): string{
 export function convertNumberColorToHex(col: number): string{
     const right = col.toString(16);
     const left = "#000000";
-    return left.slice(0, 9 - right.length) + right;
+    return left.slice(0, 7 - right.length) + right;
 }
