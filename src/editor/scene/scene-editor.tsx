@@ -62,6 +62,13 @@ export class SceneEditor extends Component{
                 manager={this.props.manager}
                 popups={[]}
             >
+                <div className={styles["parameters-group"]}>
+                    <label>Clear color:</label>
+                    <MColorPicker 
+                        initialHexColor={this.state.sceneClearColor}
+                        outputCallback={this.handleColorInput.bind(this,"sceneClearColor")}
+                    />
+                </div>
 
                 <div className={styles["parameters-group"]}>
                     <label>Ambient light</label>
