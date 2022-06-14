@@ -62,6 +62,7 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
         this.loader = loader;
 
         this.init();
+        console.log(this)
     }
 
     public start(): void{
@@ -91,6 +92,9 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
         return this.engineScene;
     }
 
+    public getEngineObjects(): EngineObjects{
+        return this.objects;
+    }
 
     public getGeneratorNodeTree(): GeneratorNodeTree{
         return this.nodeTree;
@@ -115,7 +119,7 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
     }
 
     private init(): void{        
-        this.engineScene = new EngineScene(this.getDomElement(), this.loader);
+        this.engineScene = new EngineScene(this, this.getDomElement(), this.loader);
         this.terrainManager = new TerrainManager(this.engineScene.getScene(), this.getGeneratorNodeTree(), this.loader);
         this.objects = new EngineObjects(this, this.loader);
     }
