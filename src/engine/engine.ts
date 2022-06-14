@@ -34,6 +34,8 @@ export interface EngineUserInterface{
     getGeneratorNodeTree(): GeneratorNodeTree;
  
     getTerrainManager(): TerrainManager;
+
+    getEngineObjects(): EngineObjects;
 }
 
 export class Engine implements EngineControllerInterface, EngineUserInterface{
@@ -62,7 +64,6 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
         this.loader = loader;
 
         this.init();
-        console.log(this)
     }
 
     public start(): void{
