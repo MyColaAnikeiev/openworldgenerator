@@ -96,3 +96,10 @@ export function fromMColorParamsToHex(color: MColor): string{
         return s.length === 2 ? s : '0' + s
     }).join("");
 }
+
+
+export function convertNumberColorToHex(col: number): string{
+    const right = col.toString(16);
+    const left = "#000000";
+    return left.slice(0, 9 - right.length) + right;
+}

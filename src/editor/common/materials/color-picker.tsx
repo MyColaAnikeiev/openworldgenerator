@@ -1,10 +1,10 @@
 import { Component, FormEvent } from "react";
 import { ColorPickerPopup } from "./color-picker-popup";
 import styles from "./color-picker.module.scss";
-import { isValidHexColor } from "./tools";
+import { convertNumberColorToHex, isValidHexColor } from "./tools";
 
 type Props = {
-    initialHexColor: string,
+    initialHexColor: string | number,
     outputCallback: (hex: string) => void;
 }
 
@@ -19,7 +19,9 @@ type State = {
  * 
  * props attributes:
  * 
- *  `initialHexColor` is used once (subsequent props updates is ignored).
+ *  `initialHexColor` is used once (subsequent props updates is ignored). You can provide it 
+ *  as string in css hex color format or as a single number (best way is to use hexadecimal
+ *  number furmat starting with 0x so red will be writen as 0xFF0000).
  * 
  *  `outputCallback` will be called on color changes with resulting css style hexcolor string.
  */
@@ -38,8 +40,17 @@ export class MColorPicker extends Component{
     constructor(props: Props){
         super(props);
 
+        let hexColor:string;
+        if(typeof props.initialHexColor === "string"){
+            if(props.initialHexColor.length == 8){
+                hexColor = "#" + props.initialHexColor;
+            }
+        }else{
+            hexColor = convertNumberColorToHex(props.initialHexColor)
+        }
+
         this.state = {
-            hexColor: "#" + props.initialHexColor,
+            hexColor,
             inputCursorPos: 1,
             colorPopup: false
         }
