@@ -3,6 +3,7 @@ import { EngineManager } from "../engine-manager";
 
 import styles from "./editor.module.scss";
 import { NodeEditor } from "./noise-generator/node-editor";
+import { SceneEditor } from "./scene/scene-editor";
 import { TerrainEditor } from "./terrain/terrain-editor";
 import { TopBar } from "./top-bar/top-bar";
 import { TopBarSwitchEntry } from "./top-bar/types";
@@ -71,7 +72,7 @@ export class Editor extends Component{
 
         switch(this.state.editorType){
             case "scene-editor":
-                return null
+                return <SceneEditor {...props} />
             case "node-editor":
                 return <NodeEditor {...props} />
             case "terrain-editor":
