@@ -9,6 +9,7 @@
     border: 1px solid rgb(239 239 239);
     box-sizing: border-box;
     cursor: pointer;
+    z-index: 10;
 
     &.on{
         background-color: transparent;
