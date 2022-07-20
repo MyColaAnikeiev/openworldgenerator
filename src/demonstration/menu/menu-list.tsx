@@ -39,15 +39,26 @@ export class MenuList extends Component{
         )
     }
 
+    componentDidMount(): void {
+        this.setTimeoutClock()
+    }
+
     setTimeoutClock(){
         if(this.timeoutId !== null){
             return;
         }
 
-        const clock = () => {
-            this.setState({time: this.state.time + 1});
+        if(this.props.children.every(entry => entry.timeout === null)){
+            return
+        }
 
-            this.timeoutId = setTimeout(clock, 1000);
+        const clock = () => {
+            this.props.children.forEach(entry => this.checkForTimoutAction(entry))
+
+            if(!this.actionFired){
+                this.setState({time: this.state.time + 1});
+                this.timeoutId = setTimeout(clock, 1000);
+            }
         }
 
         this.timeoutId = setTimeout(clock, 1000);
@@ -55,11 +66,11 @@ export class MenuList extends Component{
 
     getMenuEntries(){
         return this.props.children.map(entry => {
-            this.checkForTimoutAction(entry);
 
             const click = () => {
                 if(this.timeoutId !== null){
                     clearTimeout(this.timeoutId);
+                    this.timeoutId = null
                 }
                 
                 entry.action();
@@ -89,7 +100,7 @@ export class MenuList extends Component{
             }
 
             // Trigger action when entry.timeout seconds have passed.
-            if(this.state.time >= entry.timeout){
+            if(this.state.time + 1 >= entry.timeout){
                 entry.action();
                 this.actionFired = true;
                 clearTimeout(this.timeoutId);

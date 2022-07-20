@@ -56,18 +56,18 @@ export class PresetListItem extends Component{
         return (
             <div className={styles["preset"]}>
                 {
-                  this.state.edit === false && [
-                    <div className={styles["title"]} onClick={select}>{this.state.name}</div>,
-                    <div className={styles["btn"]} onClick={rename}>Rename</div>,
-                    <div className={styles["btn"]} onClick={saveToFile}>Save to file</div>,
+                  this.state.edit === false && <>
+                    <div className={styles["title"]} onClick={select}>{this.state.name}</div>
+                    <div className={styles["btn"]} onClick={rename}>Rename</div>
+                    <div className={styles["btn"]} onClick={saveToFile}>Save to file</div>
                     <div className={styles["btn"]} onClick={del}>Del</div>
-                  ]
+                  </>
                 }
                 {
-                  this.state.edit === true && [
-                    <input type="text" value={this.state.inputName} onInput={nameChange} />,
+                  this.state.edit === true && <>
+                    <input type="text" value={this.state.inputName} onInput={nameChange} />
                     <div className={styles["btn"]} onClick={update}>Ok</div>
-                  ]
+                  </>
                 }
 
             </div>

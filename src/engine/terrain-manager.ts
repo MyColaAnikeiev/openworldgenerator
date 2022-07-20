@@ -42,8 +42,6 @@ export class TerrainManager{
         if(params.planeTextureMapSrc !== undefined ){
             this.loadTextureFromSrc(params.planeTextureMapSrc);
         }
-
-        console.log(this)
     }
 
     public setViewPosition(pos: PlanePosition){

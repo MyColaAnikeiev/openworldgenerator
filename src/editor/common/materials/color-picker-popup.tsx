@@ -56,7 +56,8 @@ export class ColorPickerPopup extends Component{
         }
     }
 
-    getSnapshotBeforeUpdate(){
+    componentDidUpdate(prevProps: Props): void{
+        
         if(this.props.hexColor !== this.lastPropHexColor){
             this.lastPropHexColor = this.props.hexColor;
 

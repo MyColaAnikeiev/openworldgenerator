@@ -76,8 +76,6 @@ export class MColorPicker extends Component{
             }
         }
 
-        console.log(4, "colorPicker.render", this.state.hexColor);
-
         return (
             <div className={styles["color-picker"]}>
                 <div 

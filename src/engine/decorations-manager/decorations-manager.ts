@@ -49,7 +49,6 @@ export class DecorationsManager{
         this.lastViewPosition = {x: 0, y: 0}
 
         this.initChunkManagers()
-        console.log("DecManager", this)
     }
 
     public getParams(): DecorationManagerParams{

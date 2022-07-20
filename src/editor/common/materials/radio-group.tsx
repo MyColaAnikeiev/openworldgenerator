@@ -45,15 +45,15 @@ export function RadioGroup(prop: Props){
             {
                 prop.children.map(radio => {
                     return (
-                        <div className={styles["radio"]}>
-                        <input 
-                            type="radio" 
-                            value={radio.value}
-                            checked={radio.value === selected}
-                            onChange={handleChange}
-                        />
-                        <label>{ radio.text }</label>
-                    </div>
+                        <div key={radio.text} className={styles["radio"]}>
+                            <input 
+                                type="radio" 
+                                value={radio.value}
+                                checked={radio.value === selected}
+                                onChange={handleChange}
+                            />
+                            <label>{ radio.text }</label>
+                        </div>
                     )
                 })
             }
