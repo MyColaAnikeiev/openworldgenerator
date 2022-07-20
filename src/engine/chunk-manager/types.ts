@@ -1,4 +1,5 @@
-import { Object3D } from "three"
+import * as seedrandom from "seedrandom"
+import { BufferGeometry, Material, MeshStandardMaterial, Object3D } from "three"
 
 
 export enum ChunkReadyState{
@@ -33,5 +34,31 @@ export type ChunkGenState = {
     // May be used by generation task runner to save intermediate results if task is split midway.
     generationState: null | {
         [key:string]: any
+    }
+}
+
+
+export type DecorationModelFragment = {
+    geometry: BufferGeometry,
+    material: MeshStandardMaterial
+}
+
+export type DecorationVariant = {
+    normalizedProbability: number,
+    modelFragments: DecorationModelFragment[] 
+}
+
+export type DecorationsChunkGenState = {
+    readonly chunkArea: ChunkArea,
+    readonly instance: ChunkInstance,
+    // May be used by generation task runner to save intermediate results if task is split midway.
+    generationState: null | {
+        stage: "generation" | "merging",
+        chunkObject: Object3D | null,
+        variantsFragmentsBatches: BufferGeometry[][][],
+        randGenerator: seedrandom.PRNG,
+        chunkShiftX: number,
+        chunkShiftY: number,
+        generatedDecorations: number
     }
 }
