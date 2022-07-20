@@ -109,7 +109,7 @@ export class TerrainEditor extends Component{
             popups.push([this.getNodeSelectionPopup()]);
         }
 
-        return [];
+        return popups;
     }
 
     private getNodeSelectionPopup(){
