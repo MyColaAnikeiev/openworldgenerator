@@ -1,5 +1,5 @@
 import { NodeConnection, NodeSchema, NodeTreeSnapshot } from "../generator/types";
-import { EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
+import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
 
 export const nodeSchemas: NodeSchema[] = [
     {
@@ -127,10 +127,15 @@ const objectDescriptions: EngineOjectsDescription = {
     ]
 }   
 
+const decorationManager: DecorationManagerParams = {
+    chunkManagers: []
+}
+
 
 export const defaultPreset: EnginePreset = {
     nodeTreeSnapshot,
     scene,
     terrainManager,
+    decorationManager,
     objectDescriptions
 };

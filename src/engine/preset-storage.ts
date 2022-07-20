@@ -2,7 +2,7 @@ import { NodeTreeSnapshot } from "../generator/types";
 import { defaultPreset } from "./default-preset";
 import { EngineUserInterface } from "./engine";
 import { EngineLoader } from "./engine-loader";
-import { EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
+import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
 
 
 export interface PresetStorageManager{
@@ -90,19 +90,38 @@ export class PresetStorage implements EngineLoader,PresetStorageManager{
     }
 
     public getNodeTreeSnapshot(): NodeTreeSnapshot{
-        return this.currentPreset.nodeTreeSnapshot;
+        if(this.currentPreset.nodeTreeSnapshot){
+            return this.currentPreset.nodeTreeSnapshot;
+        }
+        return defaultPreset.nodeTreeSnapshot;
     }
 
     public getEngineSceneParams(): EngineSceneParams{
-        return this.currentPreset.scene;
+        if(this.currentPreset.scene){
+            return this.currentPreset.scene;
+        }
+        return {};
     }
 
     public getTerrainManagerParams(): TerrainManagerParams{
-        return this.currentPreset.terrainManager;
+        if(this.currentPreset.terrainManager){
+            return this.currentPreset.terrainManager;
+        }
+        return {};
+    }
+
+    public getDecorationsManagerParams(): DecorationManagerParams {
+        if(this.currentPreset.decorationManager){
+            return this.currentPreset.decorationManager;
+        }
+        return { chunkManagers: []};
     }
 
     public getObjectDescription() : EngineOjectsDescription{
-        return this.currentPreset.objectDescriptions;
+        if(this.currentPreset.objectDescriptions){
+            return this.currentPreset.objectDescriptions;
+        }
+        return defaultPreset.objectDescriptions;
     }
 
     /**
@@ -214,6 +233,9 @@ export class PresetStorage implements EngineLoader,PresetStorageManager{
 
         const terrainParams = engine.getTerrainManager().getParams();
         cur.terrainManager = {...cur.terrainManager, ...terrainParams};
+
+        const decorationsParams = engine.getDecorationsManager().getParams()
+        cur.decorationManager = decorationsParams
 
         const nodeTreeSnapshot = engine.getGeneratorNodeTree().getNodeTreeSnapshot()
         cur.nodeTreeSnapshot = nodeTreeSnapshot;

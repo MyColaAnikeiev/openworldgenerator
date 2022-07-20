@@ -54,7 +54,7 @@ export type EngineOjectsDescription = {
 }
 
 
-
+// Terrain
 export type TerrainManagerParams = {
     chunkSize?: number,
     hysteresis?: number,
@@ -69,9 +69,68 @@ export type TerreinManagerDescription = {
     params: TerrainManagerParams
 }
 
+// Decorations
+export type DecorationVariantParams = {
+    probability: number,
+    modelSrc: string,
+    gltfNodeName: string | null,
+    scale: number,
+    translate: {x: number, y: number, z: number},
+    envMapIntensity?: number,
+    alphaTest?: number,
+    color?: number | string
+}
+
+/**
+ * Used to specify changes to `DecorationVariantParams` (hence 'Diff' ending).
+ * `null` option for `envMapIntensity`, `alphaCutoff` and `color` is there to
+ * to tell that that such property should be deleted from 
+ * `DecorationVariantParams`.
+ */
+export type DecorationVariantParamsDiff = {
+    probability?: number,
+    modelSrc?: string,
+    gltfNodeName?: string | null,
+    scale?: number,
+    translate?: {x: number, y: number, z: number},
+    envMapIntensity?: number | null,
+    alphaTest?: number | null,
+    color?: number | string | null
+}
+
+export type DecorationChunkParams = {
+    displayed: boolean,
+    chunkSize: number,
+    hysteresis: number,
+    rounds: number,
+    probabilityMapId: number,
+    density: number,
+    variants: DecorationVariantParams[]
+}
+
+/**
+ * Used to specify changes to `DecorationVariantParams` (hence 'Diff' ending).
+ */
+export type DecorationChunkParamsDiff = {
+    displayed?: boolean,
+    chunkSize?: number,
+    hysteresis?: number,
+    rounds?: number,
+    probabilityMapId?: number,
+    density?: number
+}
+
+export type DecorationManagerParams = {
+    chunkManagers: DecorationChunkParams[];
+}
+
+
+// General
+
 export type EnginePreset = {
     nodeTreeSnapshot: NodeTreeSnapshot,
     scene: EngineSceneParams,
     terrainManager: TerrainManagerParams,
-    objectDescriptions: EngineOjectsDescription
+    decorationManager: DecorationManagerParams,
+    objectDescriptions: EngineOjectsDescription,
 }

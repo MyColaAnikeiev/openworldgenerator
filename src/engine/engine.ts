@@ -1,4 +1,5 @@
 import { GeneratorNodeTree } from "../generator/node-tree-generator";
+import { DecorationsManager } from "./decorations-manager/decorations-manager";
 import { EngineLoader } from "./engine-loader";
 import { EngineObjects } from "./engine-objects";
 import { EngineScene } from "./engine-scene";
@@ -35,6 +36,8 @@ export interface EngineUserInterface{
  
     getTerrainManager(): TerrainManager;
 
+    getDecorationsManager(): DecorationsManager;
+
     getEngineObjects(): EngineObjects;
 }
 
@@ -49,6 +52,7 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
     private engineScene: EngineScene;
     private objects: EngineObjects;
     private terrainManager: TerrainManager;
+    private decorationsManager: DecorationsManager;
 
     // Loop 
     private animationRequestId: number;
@@ -101,9 +105,12 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
         return this.nodeTree;
     }
 
-
     public getTerrainManager(): TerrainManager{
         return this.terrainManager;
+    }
+
+    public getDecorationsManager(): DecorationsManager {
+        return this.decorationsManager
     }
 
     public changeHostElement(element: HTMLElement): void {
@@ -117,11 +124,13 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
         this.engineScene.dispose();
         this.objects.dispose();
         this.terrainManager.dispose();
+        this.decorationsManager.dispose();
     }
 
     private init(): void{        
         this.engineScene = new EngineScene(this, this.getDomElement(), this.loader);
         this.terrainManager = new TerrainManager(this.engineScene.getScene(), this.getGeneratorNodeTree(), this.loader);
+        this.decorationsManager = new DecorationsManager(this, this.nodeTree, this.loader);
         this.objects = new EngineObjects(this, this.loader);
     }
 
@@ -133,7 +142,9 @@ export class Engine implements EngineControllerInterface, EngineUserInterface{
         }
 
         this.objects.step();
-        this.terrainManager.setViewPosition(this.objects.getMainPosition());
+        const viewPos = this.objects.getMainPosition();
+        this.terrainManager.setViewPosition(viewPos);
+        this.decorationsManager.setViewPosition(viewPos);
         this.engineScene.render(this.objects.getCamera());
 
         this.animationRequestId = requestAnimationFrame(this.loop.bind(this));
