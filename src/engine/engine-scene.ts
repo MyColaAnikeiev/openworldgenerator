@@ -1,4 +1,4 @@
-import { AmbientLight, DirectionalLight, Fog, FogBase, FogExp2, Scene, WebGLRenderer } from "three";
+import { AmbientLight, DirectionalLight, Fog, FogBase, FogExp2, PMREMGenerator, Scene, Texture, WebGLRenderer } from "three";
 import { Camera } from "./cameras/camera";
 import { Engine } from "./engine";
 import { EngineLoader } from "./engine-loader";
@@ -29,6 +29,8 @@ export class EngineScene{
     private sun: DirectionalLight;
     private fog: FogBase;
 
+    private pmremGenerator: PMREMGenerator;
+
     private resizeHandler: () => void;
     
 
@@ -51,7 +53,7 @@ export class EngineScene{
         this.renderer.setClearColor(params.sceneClearColor);
 
         this.sun = new DirectionalLight(params.sunLightColor,params.sunLightIntensity);
-        this.sun.position.y = 20;
+        this.sun.position.y = 500;
         this.sun.position.x = 2;
         this.scene.add(this.sun);
 
@@ -70,6 +72,14 @@ export class EngineScene{
         this.hostElement.appendChild(this.renderer.domElement);
     }
 
+
+    public getEnvironmentMap(): Texture{
+        if(!this.pmremGenerator){
+            this.pmremGenerator = new PMREMGenerator(this.renderer);
+        }
+
+        return this.pmremGenerator.fromScene(this.scene).texture;
+    }
 
     /**
      * Look at which properties was changed and updates scene accordingly.
@@ -185,7 +195,8 @@ export class EngineScene{
         this.ambientLight.dispose();
         this.sun.dispose();
 
-        this.renderer.dispose();
+        if(this.pmremGenerator) this.pmremGenerator.dispose()
+        this.renderer.dispose()
     }
 
     private resetSizes(){
