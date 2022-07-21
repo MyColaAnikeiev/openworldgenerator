@@ -44,6 +44,7 @@ export type DecorationModelFragment = {
 }
 
 export type DecorationVariant = {
+    id: number,
     normalizedProbability: number,
     modelFragments: DecorationModelFragment[] 
 }

@@ -11,6 +11,60 @@ import { DecorationVariant } from "../chunk-manager/types";
 import { ModelLoaderI } from "../../common/tools/model-loader/model-loader-interface";
 import { SimpleStateMachine, SimpleStateMachineTransition } from "../../common/tools/state-machine";
 
+/**
+ * INTERFACE for retriving and editing {@link DecorationsManager} parameters.
+ */
+export interface DecorationsParamManager{
+
+    /**
+     * Obtain latest Params of {@link DecorationsManager}.
+     */
+    getParams(): DecorationManagerParams;
+
+    /**
+     * Create and add blank decoration chunk manager.
+     */
+    addChunkManager(): void;
+
+    /**
+     * @param managerId - id of {@link DecorationsChunkManager} to update
+     * @param params one or more {@link DecorationsChunkManager} parameters to 
+     * update. See {@link DecorationChunkParamsDiff} for available params.
+     */
+    updateChunkManager(id: number, param: DecorationChunkParamsDiff): void;
+    
+    /**
+     * @param managerId - id of {@link DecorationsChunkManager} to deleted.
+     */
+    removeChunkManager(id: number): void;
+
+    /**
+     * Creates and adds blank decoration variant.
+     * 
+     * @param managerId - decoration chunk manager id to which decoration 
+     * variant will be added.
+     */
+    addChunkManagerVariant(managerId: number): void;
+
+    /**
+     * 
+     * @param managerId id of {@link DecorationsChunkManager} to whom 
+     * DecorationVariant belongs to.
+     * @param variantId id of {@link DecorationVariant} to be updated.
+     * @param param one or more {@link DecorationVariantParams} parameters to
+     * update.
+     */
+    updateChunkManagerVariant(managerId: number, variantId: number, param: DecorationVariantParamsDiff): void;
+
+    /**
+     * 
+     * @param managerId id of {@link DecorationsChunkManager} to whom 
+     * DecorationVariant belongs to.
+     * @param variantId id of {@link DecorationVariant} to be deleted.
+     */
+    removeChunkManagerVariant(managerId: number, variantId: number): void;
+
+}
 
 type DecManagerStates = "NOTLOADED" | "LOADING" | "LOADED" | "CANCELED" | "DELETED"
 const decManagerStateTransitions: SimpleStateMachineTransition<DecManagerStates>[] = [
@@ -22,6 +76,7 @@ const decManagerStateTransitions: SimpleStateMachineTransition<DecManagerStates>
     {fromState: "*", toState: "DELETED"}
 ]
 interface ChunkManager {
+    id: number,
     stateHolder: SimpleStateMachine<DecManagerStates>,
     instance: DecorationsChunkManager | null,
     decorationVariants: DecorationVariant[]
@@ -31,7 +86,7 @@ interface ChunkManager {
  * Class for object responsible for creating, disposing and updating 
  * {@link DecorationsChunkManager}'s.
  */
-export class DecorationsManager{
+export class DecorationsManager implements DecorationsParamManager{
 
     private params: DecorationManagerParams;
     private chunkManagers: ChunkManager[];
@@ -55,18 +110,35 @@ export class DecorationsManager{
         return this.deepCopyParams(this.params)
     }
 
-    /**
-     * @param decorationIndex index of chankManager parameter of which to update
-     * @param params one or more {@link DecorationsChunkManager} parameters to 
-     * update. See {@link DecorationChunkParamsPart} for available params.
-     */
-    public updateDecParams(decorationIndex: number, params: DecorationChunkParamsDiff): void{
-        if(this.chunkManagers.length <= decorationIndex){
+    public addChunkManager(): void {
+        const idList = this.params.chunkManagers.map(mng => mng.id)
+        const newId = Math.max(0,...idList) + 1
+
+        this.params.chunkManagers.push({
+            id: newId,
+            displayed: true,
+            chunkSize: 10,
+            hysteresis: 0.1,
+            rounds: 1,
+            probabilityMapId: 0,
+            density: 0,
+            variants: []
+        })
+
+        this.chunkManagers.push({
+            id: newId,
+            stateHolder: new SimpleStateMachine(decManagerStateTransitions, "NOTLOADED"),
+            instance: null, 
+            decorationVariants: []
+        })
+    }
+
+    public updateChunkManager(managerId: number, params: DecorationChunkParamsDiff): void{
+        const decManagerParams = this.params.chunkManagers.find(managerParams => managerParams.id === managerId)
+        const chunkManager = this.chunkManagers.find(manager => manager.id === managerId)
+        if(!decManagerParams || ! chunkManager){
             return
         }
-
-        const decManagerParams = this.params.chunkManagers[decorationIndex]
-        const chunkManager = this.chunkManagers[decorationIndex]
 
         const diffParams: DecorationChunkParamsDiff = {}
         // Filter out params that haven't changed, and also copy one that have.
@@ -116,31 +188,51 @@ export class DecorationsManager{
         }
     }
 
-    /**
-     * @param decorationIndex - decoration chunk manager index.
-     * @param variantIndex - decoration variant index.
-     */
-    public deleteDecVariant(decorationIndex: number, variantIndex: number): void{
-        const chunkManager = this.chunkManagers[decorationIndex]
-        const chunkManagerParams = this.params.chunkManagers[decorationIndex]
-        chunkManagerParams.variants.splice(variantIndex, 1)
+    public removeChunkManager(id :number): void{
+        const chunkManager = this.chunkManagers.find(manager => manager.id === id)
+        if(!chunkManager){
+            return
+        }
 
+        this.chunkManagers = this.chunkManagers.filter(manager => manager.id !== id)
+        this.params.chunkManagers = this.params.chunkManagers.filter(managerParam => managerParam.id !== id)
+
+        this.triggerChunkManagerStateChange("delete", chunkManager)
+    }
+
+    public addChunkManagerVariant(managerId: number): void {
+        const managerParams = this.params.chunkManagers.find(mp => mp.id === managerId)
+        if(!managerParams){
+            return 
+        }
+
+        const idList = managerParams.variants.map(variant => variant.id)
+        const newId = Math.max(0, ...idList)
+        managerParams.variants.push({
+            id: newId,
+            probability: 1,
+            modelSrc: "",
+            gltfNodeName: null,
+            scale: 1.0,
+            translate: {x:0, y: 0, z: 0},
+        })
+
+        const chunkManager = this.chunkManagers.find(manager => manager.id === managerId)
         this.triggerChunkManagerStateChange("off", chunkManager)
         this.triggerChunkManagerStateChange("on", chunkManager)
     }
 
-    /**
-     * 
-     * @param decorationIndex - index of decoration chunk manager.
-     * @param variantIndex - index of decoration variant.
-     * @param param - one or more of {@link DecorationVariantParams} parameters
-     * to update {@link DecorationVariant} with.
-     */
-    public updateDecVariant(decorationIndex: number, variantIndex: number, param: DecorationVariantParamsDiff): void{
-        const decorationManagerParams = this.params.chunkManagers[decorationIndex]
-        const variantParams = decorationManagerParams.variants[variantIndex]
-        const chunkManager = this.chunkManagers[decorationIndex]
-        const decorationVariant = chunkManager.decorationVariants[variantIndex]
+    public updateChunkManagerVariant(managerId: number, variantId: number, param: DecorationVariantParamsDiff): void{
+        const decorationManagerParams = this.params.chunkManagers.find(managerParams => managerParams.id === managerId)
+        if(!decorationManagerParams){
+            return 
+        }
+        const variantParams = decorationManagerParams.variants.find(variantParams => variantParams.id === variantId)
+        if(!variantParams){
+            return
+        }
+        const chunkManager = this.chunkManagers.find(manager => manager.id === managerId)
+        const decorationVariant = chunkManager.decorationVariants.find(variant => variant.id === variantId)
 
         let needReload = false
 
@@ -180,16 +272,16 @@ export class DecorationsManager{
         }
     }
 
-    /**
-     * @param decorationIndex - index of decoration chunk manager to delete.
-     */
-    public deleteDecChunkManager(decorationIndex:number): void{
-        const chunkManager = this.chunkManagers[decorationIndex]
-        this.chunkManagers.splice(decorationIndex,1)
-        this.params.chunkManagers.splice(decorationIndex,1)
+    public removeChunkManagerVariant(managerId: number, variantId: number): void{
+        const chunkManager = this.chunkManagers.find(manager => manager.id === managerId)
+        const chunkManagerParams = this.params.chunkManagers.find(managerParam => managerParam.id === managerId)
+        chunkManagerParams.variants = chunkManagerParams.variants.filter(variantParam => variantParam.id !== variantId)
 
-        this.triggerChunkManagerStateChange("delete", chunkManager)
+        this.triggerChunkManagerStateChange("off", chunkManager)
+        this.triggerChunkManagerStateChange("on", chunkManager)
     }
+
+    
 
     public setViewPosition(pos: PlanePosition){
         this.lastViewPosition = pos
@@ -207,7 +299,8 @@ export class DecorationsManager{
     }
 
     private initChunkManagers(): void{
-        this.chunkManagers = this.params.chunkManagers.map(() => ({
+        this.chunkManagers = this.params.chunkManagers.map(chunkParams => ({
+            id: chunkParams.id,
             stateHolder: new SimpleStateMachine(decManagerStateTransitions, "NOTLOADED"),
             instance: null, 
             decorationVariants: []

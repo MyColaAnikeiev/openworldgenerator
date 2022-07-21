@@ -49,7 +49,8 @@ export class DecorationVariantsLoader implements DecorationVariantsLoaderI{
     const totalProbability = variantsParams.reduce((prev, variant) => prev + variant.probability, 0)
 
     return variantsParams.map(variantParams => {
-        return { 
+        return {
+            id: variantParams.id,
             normalizedProbability: variantParams.probability / totalProbability,
             modelFragments: this.getFragments(variantParams)
         }

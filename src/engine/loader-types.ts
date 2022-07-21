@@ -71,6 +71,7 @@ export type TerreinManagerDescription = {
 
 // Decorations
 export type DecorationVariantParams = {
+    id: number,
     probability: number,
     modelSrc: string,
     gltfNodeName: string | null,
@@ -99,6 +100,7 @@ export type DecorationVariantParamsDiff = {
 }
 
 export type DecorationChunkParams = {
+    id: number,
     displayed: boolean,
     chunkSize: number,
     hysteresis: number,
