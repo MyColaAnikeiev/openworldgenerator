@@ -251,7 +251,7 @@ export class ModelLoader implements ModelLoaderI{
 
     mapKeys.forEach(key => {
       if(key in mat){
-        (mat[key] as Texture).dispose()
+        (mat[key] as Texture)?.dispose()
       }
     })
   }
