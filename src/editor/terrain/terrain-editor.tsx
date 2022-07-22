@@ -1,10 +1,9 @@
 import { Component, ReactElement } from "react";
 import { EngineManager } from "../../engine-manager";
 import { EditorTabBody } from "../common/editor-tab-body";
+import { LabeledButton } from "../common/materials/labeled-button";
 import { LabeledNumberInput } from "../common/materials/labeled-number-input";
-import { NodeArea } from "../noise-generator/node-area";
-
-import styles from "./terrain-editor.module.scss";
+import { NodeSelectionPopup } from "../common/node-selection-popup";
 import { TerrainTextureInputSection } from "./terrain-texture-input-section";
 
 type Props = {
@@ -78,12 +77,11 @@ export class TerrainEditor extends Component{
                     title=""
                 />
 
-                <div className={styles["node-selection"]}>
-                    <label>Heightmap source node({params.sourceNodeId})</label>
-                    <button onClick={this.switchToNodeSelectionMode}>
-                        Select
-                    </button>
-                </div>
+                <LabeledButton 
+                    labelText={`Heightmap source node(${params.sourceNodeId})`}
+                    buttonText="Select"
+                    action={this.switchToNodeSelectionMode}
+                />
 
                 <TerrainTextureInputSection 
                     manager={this.props.manager.getEngine().getTerrainManager()} 
@@ -132,21 +130,11 @@ export class TerrainEditor extends Component{
             })
         }
 
-        return (
-            <div className={styles["node-selection-popup"]}>
-                <div className={styles["top"]}>
-                    <span>Select source node.</span>
-                    <button onClick={goBack}>Cancel</button>    
-                </div>
-                <div className={styles["node-area-container"]}>
-                    <NodeArea
-                        nodeTreeBuilder={nodeTree} 
-                        selectionMode={true}
-                        selectionCallback={selectNode}
-                    />
-                </div>
-            </div>
-        )
+        return <NodeSelectionPopup 
+            goBackCallback={goBack}
+            nodeTree={nodeTree}
+            selectionCallback={selectNode}
+        />
     }
 
     private setUpCallbacks(): void{
