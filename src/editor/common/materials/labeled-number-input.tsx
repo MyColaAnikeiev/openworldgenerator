@@ -26,11 +26,14 @@ export class LabeledNumberInput extends Component{
     props: Props;
     state: State;
 
+    lastInitialValue: number;
+
     inputHandler: (evt: FormEvent<HTMLInputElement>) => void;
 
     constructor(props: Props){
         super(props);
 
+        this.lastInitialValue = props.initialValue
         this.state = {
             inputValue: props.initialValue !== undefined ? props.initialValue : props.min !== undefined ? props.min : 0
         }
@@ -38,6 +41,12 @@ export class LabeledNumberInput extends Component{
         this.inputHandler = this.handleInput.bind(this);
     }
 
+    componentDidUpdate(prevProps: Readonly<Props>): void {
+        if(this.props.initialValue !== this.lastInitialValue){
+            this.lastInitialValue = this.props.initialValue
+            this.setState({inputValue: this.props.initialValue})
+        }
+    }
 
     render(): ReactNode {
         const params: InputParams = {};
