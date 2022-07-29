@@ -1,6 +1,6 @@
-import { EngineUserInterface } from "../engine";
+import { EngineUserInterface } from "../../engine";
 import { EngineObjects } from "../engine-objects";
-import { Orientation, Position } from "../types";
+import { Orientation, Position } from "../../types";
 
 
 export abstract class Entity{

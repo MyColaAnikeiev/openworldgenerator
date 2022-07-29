@@ -1,4 +1,5 @@
 import { PerspectiveCamera } from "three";
+import { Entity } from "../entities/entity";
 import { CameraParameters } from "./types";
 
 
@@ -9,9 +10,15 @@ export abstract class Camera{
     public abstract getCamera(): PerspectiveCamera;
 
     /**
-     * Trigger cammera update.
+     * Checks the position and orientation of binded Entity and trigger cammera
+     * update.
      */
-    abstract step(): void;
+    public abstract step(): void;
+
+    /**
+     * Binds camera to a new `Entity` for camera to folow.
+     */
+    public abstract bindEntity(entity: Entity): void;
 
     /**
      * Takes one or more parameters and apdate camera with it.

@@ -15,7 +15,7 @@ export class ViewCamera extends Camera{
     params: CameraParameters;
 
     /**
-     * @param bindedEntity is an instance that camera will follow.
+     * @param bindedEntity is an entity instance that camera will follow.
      */
     constructor(private bindedEntity: Entity | null){
         super();
@@ -36,11 +36,6 @@ export class ViewCamera extends Camera{
      */
     public bindEntity(entity: Entity){
         this.bindedEntity = entity;
-    }
-
-
-    public unbindEntity(){
-        this.bindEntity = null;
     }
 
     public step(): void {

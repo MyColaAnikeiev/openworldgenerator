@@ -1,7 +1,7 @@
-import { EngineUserInterface } from "../engine";
+import { EngineUserInterface } from "../../engine";
 import { EngineObjects } from "../engine-objects";
-import { TerrainManager } from "../terrain-manager";
-import { Orientation, PlanePosition, Position } from "../types";
+import { TerrainManager } from "../../terrain-manager";
+import { Orientation, PlanePosition, Position } from "../../types";
 import { Entity } from "./entity";
 
 

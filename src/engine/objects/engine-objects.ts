@@ -2,12 +2,13 @@ import { Camera } from "./cameras/camera";
 import { ViewCamera } from "./cameras/view-camera";
 import { EntityController } from "./controlls/controller";
 import { ViewController } from "./controlls/view-controller";
-import { EngineUserInterface } from "./engine";
-import { EngineLoader } from "./engine-loader";
+import { EngineUserInterface } from "../engine";
+import { EngineLoader } from "../engine-loader";
 import { Entity } from "./entities/entity";
+import { OrbitalViewEntity } from "./entities/orbital-view-entity";
 import { ViewEntity } from "./entities/view-entity";
-import { EngineOjectsDescription } from "./loader-types";
-import { PlanePosition } from "./types";
+import { EngineOjectsDescription } from "../loader-types";
+import { PlanePosition } from "../types";
 
 
 export class EngineObjects{
@@ -28,7 +29,7 @@ export class EngineObjects{
     /**
      * Call before instantiating camera and controllers.
      */
-     private instantiateEntities(){
+    private instantiateEntities(){
         this.objectDescroptions.entities.forEach(desc => {
 
             switch (desc.type){
@@ -37,6 +38,11 @@ export class EngineObjects{
                       new ViewEntity(desc.id, this.hostEngine, this, desc.position, desc.orientation)  
                     );
                     break;
+                case "orbital-viewer":
+                    this.entities.push(
+                        new OrbitalViewEntity(desc.id, this.hostEngine, this, desc.position, desc.orientation)
+                    )
+                break
             }
 
         })

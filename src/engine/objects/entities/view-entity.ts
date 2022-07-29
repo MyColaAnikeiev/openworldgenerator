@@ -1,6 +1,6 @@
-import { EngineUserInterface } from "../engine";
+import { EngineUserInterface } from "../../engine";
 import { EngineObjects } from "../engine-objects";
-import { Orientation, PlanePosition, Position } from "../types";
+import { Orientation, PlanePosition, Position } from "../../types";
 import { Entity } from "./entity";
 
 
