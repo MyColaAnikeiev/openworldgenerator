@@ -281,7 +281,9 @@ export class DecorationsManager implements DecorationsParamManager{
         this.triggerChunkManagerStateChange("on", chunkManager)
     }
 
-    
+    public getModelLoader(): ModelLoaderI{
+        return this.modelLoader
+    }
 
     public setViewPosition(pos: PlanePosition){
         this.lastViewPosition = pos
