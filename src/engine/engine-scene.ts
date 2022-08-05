@@ -1,5 +1,5 @@
-import { AmbientLight, DirectionalLight, Fog, FogBase, FogExp2, PMREMGenerator, Scene, Texture, WebGLRenderer } from "three";
-import { Camera } from "./cameras/camera";
+import { AmbientLight, DirectionalLight, Fog, FogBase, FogExp2, Object3D, PMREMGenerator, Scene, Texture, WebGLRenderer } from "three";
+import { Camera } from "./objects/cameras/camera";
 import { Engine } from "./engine";
 import { EngineLoader } from "./engine-loader";
 import { EngineSceneParams } from "./loader-types";
@@ -165,6 +165,20 @@ export class EngineScene{
         return this.scene;
     }
 
+    /**
+     * @param obj - three.js Object3d to be added to scene.
+     */
+    public addSceneObject(obj: Object3D): void{
+        this.scene.add(obj)
+    }
+
+    /**
+     * 
+     * @param obj - three.js Object3d to be removed from scene.
+     */
+    public removeSceneObject(obj: Object3D): void{
+        this.scene.remove(obj)
+    }
 
     public getRenderingCanvas(): HTMLCanvasElement{
         return this.renderer.domElement;
