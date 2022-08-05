@@ -207,7 +207,7 @@ export class DecorationsManager implements DecorationsParamManager{
         }
 
         const idList = managerParams.variants.map(variant => variant.id)
-        const newId = Math.max(0, ...idList)
+        const newId = Math.max(0, ...idList) + 1
         managerParams.variants.push({
             id: newId,
             probability: 1,
@@ -388,6 +388,7 @@ export class DecorationsManager implements DecorationsParamManager{
 
             if(!probabilityMap || variants.length === 0){
                 this.decorationVariantsLoader.disposeOfDecorationVariants(variants)
+                chunkManager.stateHolder.setState("CANCELED")
                 chunkManager.stateHolder.setState("NOTLOADED")
                 return
             }
