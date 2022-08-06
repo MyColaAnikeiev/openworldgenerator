@@ -134,6 +134,7 @@ export class DecorationsManager implements DecorationsParamManager{
     }
 
     public updateChunkManager(managerId: number, params: DecorationChunkParamsDiff): void{
+        debugger
         const decManagerParams = this.params.chunkManagers.find(managerParams => managerParams.id === managerId)
         const chunkManager = this.chunkManagers.find(manager => manager.id === managerId)
         if(!decManagerParams || ! chunkManager){
@@ -161,6 +162,10 @@ export class DecorationsManager implements DecorationsParamManager{
         }
 
         if(chunkManager.stateHolder.state !== "LOADED"){
+            if(decManagerParams.displayed){
+                this.triggerChunkManagerStateChange("off", chunkManager)
+                this.triggerChunkManagerStateChange("on", chunkManager)
+            }
             return
         }
 
@@ -240,6 +245,10 @@ export class DecorationsManager implements DecorationsParamManager{
             if(param[paramKey] !== undefined && variantParams[paramKey] !== param[paramKey]){
                 needReload = true
                 variantParams[paramKey] = param[paramKey]
+
+                if(paramKey === "modelSrc"){
+                    needReload = true
+                }
             }
         })
 
@@ -255,13 +264,16 @@ export class DecorationsManager implements DecorationsParamManager{
                     needReload = true
                 }else{
                     variantParams[paramKey] = param[paramKey]
-                    decorationVariant.modelFragments.forEach(fragment => {
-                        if(fragment.material[paramKey].set){
-                            fragment.material[paramKey].set(param[paramKey])
-                        }else{
-                            fragment.material[paramKey] = param[paramKey]
-                        }
-                    })
+
+                    if(decorationVariant){
+                        decorationVariant.modelFragments.forEach(fragment => {
+                            if(fragment.material[paramKey].set){
+                                fragment.material[paramKey].set(param[paramKey])
+                            }else{
+                                fragment.material[paramKey] = param[paramKey]
+                            }
+                        })
+                    }
                 }
             }
         })
