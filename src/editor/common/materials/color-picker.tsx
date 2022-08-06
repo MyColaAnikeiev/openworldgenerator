@@ -40,13 +40,23 @@ export class MColorPicker extends Component{
     constructor(props: Props){
         super(props);
 
-        let hexColor:string;
+        let hexColor:string = "#ffffff";
         if(typeof props.initialHexColor === "string"){
-            if(props.initialHexColor.length == 8){
-                hexColor = "#" + props.initialHexColor;
+            if(props.initialHexColor.length === 6){
+                const hexstr = "#" + props.initialHexColor
+                if(isValidHexColor(hexstr)) {
+                    hexColor = hexstr
+                }
+            }
+            if(props.initialHexColor.length === 7){
+                if(isValidHexColor(props.initialHexColor)){
+                    hexColor = props.initialHexColor
+                }
             }
         }else{
-            hexColor = convertNumberColorToHex(props.initialHexColor)
+            if(props.initialHexColor > -1){
+                hexColor = convertNumberColorToHex(props.initialHexColor)
+            }
         }
 
         this.state = {
@@ -182,6 +192,7 @@ export class MColorPicker extends Component{
 
         if(value.length === 7){
             if(isValidHexColor(value)){
+                this.props.outputCallback(value)
                 this.setState({ hexColor: value});
             }
 
@@ -192,6 +203,7 @@ export class MColorPicker extends Component{
         
         const replaced = value.slice(0, insertPoint) + value.slice(insertPoint+exceeding);
         if(isValidHexColor(replaced)){
+            this.props.outputCallback(replaced)
             this.setState({ hexColor: replaced });
         }
     }
