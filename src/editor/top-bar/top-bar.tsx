@@ -12,7 +12,7 @@ type Props = {
 }
 
 export function TopBar(props: Props){
-    
+    const currentPresetName = props.manager.getCurrentPresetName()
 
     const saveCurrentPreset = () => {
         const mng = props.manager.getStorageManager();
@@ -20,17 +20,21 @@ export function TopBar(props: Props){
         mng.savePreset();
     }
 
+    const saveAs = () => { 
+       const presetName = prompt("Preset name", "")
+       props.manager.savePreset(presetName)
+    }
 
     return (
         <div className={styles["top-bar"]}>
             <DropdownMenu>{[
                 {
-                    text: "Save",
+                    text: 'Save as "' + currentPresetName + '"',
                     action: saveCurrentPreset  
                 },
                 {
                     text: "Save as",
-                    action: () => {}
+                    action: saveAs
                 },
                 {
                     text: "Exit editor",
