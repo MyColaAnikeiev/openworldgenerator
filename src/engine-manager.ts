@@ -52,6 +52,10 @@ export class EngineManager{
         }
     }
 
+    public getCurrentPresetName(): string{
+        return this.loader.getCurrentPresetName()
+    }
+
     /**
      * Provide `presetName` when you want to save preset under different name unstead
      * of updating existing one.

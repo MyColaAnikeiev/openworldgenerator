@@ -20,4 +20,13 @@
         font-weight: 800;
         cursor: pointer;
     }
+
+    &-selected{
+        background-color: #000000;
+        color: #b8bba0;
+        
+        .btn{
+            color: rgb(193, 184, 211);;
+        }
+    }
 }

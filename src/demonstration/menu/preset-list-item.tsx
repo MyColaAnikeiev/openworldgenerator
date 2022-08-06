@@ -4,6 +4,7 @@ import styles from "./preset-list-item.module.scss";
 
 type Props = {
     presetName: string,
+    selected: boolean,
     selectCallback: (name: string) => void,
     renameCallback: (oldName: string, newName: string) => void,
     deleteCallback: (name: string) => void,
@@ -53,8 +54,9 @@ export class PresetListItem extends Component{
             this.setState({name: this.state.inputName, edit: false});
         }
 
+        const selectedClass = this.props.selected ? ' ' + styles['preset-selected'] : ''
         return (
-            <div className={styles["preset"]}>
+            <div className={styles["preset"] + selectedClass}>
                 {
                   this.state.edit === false && <>
                     <div className={styles["title"]} onClick={select}>{this.state.name}</div>

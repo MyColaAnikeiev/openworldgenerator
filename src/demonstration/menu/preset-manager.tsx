@@ -47,6 +47,7 @@ export class PresetManager extends Component{
         
         return list.map(presetName => {
             const mng = this.props.engineManager.getStorageManager();
+            const selected = mng.getCurrentPresetName() === presetName
 
             const props = {
                 presetName,
@@ -59,7 +60,7 @@ export class PresetManager extends Component{
                 deleteCallback: mng.removePreset.bind(mng)
             }
 
-            return <PresetListItem key={presetName} {...props} />
+            return <PresetListItem selected={selected} key={presetName} {...props} />
         })
     }
 
