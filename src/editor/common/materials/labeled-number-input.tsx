@@ -1,5 +1,6 @@
 import { Component, FormEvent, ReactNode } from "react";
 import styles from "./labeled-number-input.module.scss"
+import { NumberInput } from "./number-input";
 
 type Props = {
     label: string,
@@ -11,20 +12,9 @@ type Props = {
     inputCallbeck: (value: number) => void
 }
 
-type InputParams = {
-    min?: number,
-    max?: number,
-    step?: number
-}
-
-type State = {
-    inputValue: number
-}
-
 export class LabeledNumberInput extends Component{
 
     props: Props;
-    state: State;
 
     lastInitialValue: number;
 
@@ -34,28 +24,9 @@ export class LabeledNumberInput extends Component{
         super(props);
 
         this.lastInitialValue = props.initialValue
-        this.state = {
-            inputValue: props.initialValue !== undefined ? props.initialValue : props.min !== undefined ? props.min : 0
-        }
-
-        this.inputHandler = this.handleInput.bind(this);
-    }
-
-    componentDidUpdate(prevProps: Readonly<Props>): void {
-        if(this.props.initialValue !== this.lastInitialValue){
-            this.lastInitialValue = this.props.initialValue
-            this.setState({inputValue: this.props.initialValue})
-        }
     }
 
     render(): ReactNode {
-        const params: InputParams = {};
-        ["min","max","step"].forEach(prm =>{
-            if(prm in this.props){
-                params[prm] = this.props[prm];
-            }
-        })
-
         const labelParams: { title?: string } = {};
         if(this.props.title){
             labelParams.title = this.props.title;
@@ -66,24 +37,10 @@ export class LabeledNumberInput extends Component{
 
                 <label {...labelParams}>{this.props.label}</label>
 
-                <input 
-                    onInput={this.inputHandler}
-                    value={this.state.inputValue} 
-                    type="number" 
-                    {...params}
-                />
+                <NumberInput {...this.props} />
 
             </div>
         )
-    }
-
-    handleInput(evt: FormEvent<HTMLInputElement>): void{
-        const value = Number((evt.target as HTMLInputElement).value);
-
-        if(isFinite(value)){
-            this.props.inputCallbeck(value)
-            this.setState({inputValue: value});
-        }
     }
 
 }
