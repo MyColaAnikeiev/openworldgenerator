@@ -22,7 +22,7 @@ export type EngineSceneParams = {
 /**
  * Objects
  */
-export type EntityType = "viewer"
+export type EntityType = "viewer" | "orbital-viewer"
 
 export type EntityDescription = {
     id: number,

@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { EngineManager } from "../engine-manager";
+import { DecorationsEditor } from "./decorations/decorations-editor";
 
 import styles from "./editor.module.scss";
 import { NodeEditor } from "./noise-generator/node-editor";
@@ -47,6 +48,11 @@ export class Editor extends Component{
                 text: "terrain",
                 iconSrc:"public/assets/fontawesome/solid/earth-africa.svg",
                 action: () => this.setState({editorType: "terrain-editor"})
+            },
+            {
+                text: "decorations",
+                iconSrc:"public/assets/fontawesome/solid/tree.svg",
+                action: () => this.setState({editorType: "decorations-editor"})
             } 
         ];
 
@@ -77,6 +83,8 @@ export class Editor extends Component{
                 return <NodeEditor {...props} />
             case "terrain-editor":
                 return <TerrainEditor {...props}/>
+            case "decorations-editor":
+                return <DecorationsEditor {...props} />
         }
 
         return null;

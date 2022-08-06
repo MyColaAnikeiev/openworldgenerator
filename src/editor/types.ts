@@ -1,1 +1,1 @@
-export type EditorType = "node-editor" | "scene-editor" | "terrain-editor";
+export type EditorType = "node-editor" | "scene-editor" | "terrain-editor" | "decorations-editor";
