@@ -35,7 +35,7 @@ export class EngineManager{
         return this.loader;
     }
     
-    public getEngine(): EngineUserInterface | undefined{
+    public getEngine(): Engine | undefined{
         return this.engine;
     }
 
