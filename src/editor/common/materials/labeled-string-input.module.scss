@@ -1,0 +1,28 @@
+.container{
+  width: 100%;
+  margin: 5px 0;
+
+  .label{
+    margin: 8px 0 2px 0;
+    display: block;
+    color: white;
+    font-size: 17px;
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  .input-container{
+    display: grid;
+    grid-template: auto / 1fr 60px;
+    justify-items: center;
+
+    input{
+      width: 100%;
+      background-color: rgb(187, 187, 187);
+      color: rgb(46, 46, 46);
+      font-size: 18px;
+      border: 1px solid black;
+    }    
+  }
+
+
+}
