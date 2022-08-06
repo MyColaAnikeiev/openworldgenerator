@@ -147,6 +147,8 @@ export class ModelLoader implements ModelLoaderI{
       return
     }
 
+    this.pendingModelRequests.delete(URL)
+
     request.finished[ind] = true
     
     const requestCompleted = request.finished.every(fin => fin)
