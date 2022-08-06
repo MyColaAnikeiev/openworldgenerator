@@ -33,7 +33,7 @@ export class DecorationsChunkManager extends BaseChunkManager{
         private terrainManager: TerrainManager,
         private noiseGenerator: GeneratorNode,
         private noiseGenerator$: Observable<GeneratorNode | null> | null,
-        density: number,
+        private density: number,
         private variants: DecorationVariant[]
     ){
         super(scene, viewPosition, chunkSize, hysteresis, rounds);
@@ -69,9 +69,15 @@ export class DecorationsChunkManager extends BaseChunkManager{
      * equals 1.0 for that unit square.
      */
     public setDensity(density: number): void{
+        this.density = density
         this.maxDecQuantity = Math.ceil(this.chunkSize*this.chunkSize * density);
         this.setChunksAsToBeReplaced();
         this.updateChunks();
+    }
+
+    public setChunkSize(newSize: number): void{
+        this.maxDecQuantity = Math.ceil(newSize*newSize * this.density);
+        super.setChunkSize(newSize)
     }
 
     protected getBlankInstance(round: number): ChunkInstance {
