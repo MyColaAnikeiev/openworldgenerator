@@ -1,7 +1,7 @@
 import { GeneratorNodeTree } from "../generator/node-tree-generator";
 import { DecorationsManager } from "./decorations-manager/decorations-manager";
 import { EngineLoader } from "./engine-loader";
-import { EngineObjects } from "./engine-objects";
+import { EngineObjects } from "./objects/engine-objects";
 import { EngineScene } from "./engine-scene";
 import { TerrainManager } from "./terrain-manager";
 
