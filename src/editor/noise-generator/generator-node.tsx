@@ -43,10 +43,12 @@ export class GeneratorNodeComponent extends Component{
 
         this.state = {
             drag:  { on: false },
-            previewOn: false
+            previewOn: this.props.schema.previewOn
         }
 
-        this.previewOn();
+        if(this.props.schema.previewOn){
+            this.previewOn()
+        }
     }
 
     render(){

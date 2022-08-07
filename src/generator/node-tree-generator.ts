@@ -119,7 +119,7 @@ export class GeneratorNodeTree implements NodeTreeBuilder, NodeTreeUser {
 
         this.nodeSchemas.push({
             id: maxId + 1,
-            previewOn: true,
+            previewOn: false,
             type,
             subtype,
             position: {top, left},
