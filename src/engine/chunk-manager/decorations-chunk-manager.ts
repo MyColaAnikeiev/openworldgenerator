@@ -138,8 +138,10 @@ export class DecorationsChunkManager extends BaseChunkManager{
 
                 const helper = new Object3D();
                 const scale = 0.6 + rand()
+                const orientation = rand() * Math.PI * 2
                 helper.scale.set(scale,scale,scale);
                 helper.position.set(posX, height, posY);
+                helper.rotateY(orientation)
                 helper.updateWorldMatrix(true, true);
 
                 modelFragments.forEach((mesh, index) => {
@@ -149,7 +151,7 @@ export class DecorationsChunkManager extends BaseChunkManager{
                 })
 
             }else if(this.variants.length > 1){
-                rand(); rand();
+                rand(); rand(); rand()
             }
 
 
