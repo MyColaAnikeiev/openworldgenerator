@@ -120,7 +120,7 @@ export class DecorationsManager implements DecorationsParamManager{
             chunkSize: 10,
             hysteresis: 0.1,
             rounds: 1,
-            probabilityMapId: 0,
+            probabilityMapId: null,
             density: 0,
             variants: []
         })
@@ -134,7 +134,6 @@ export class DecorationsManager implements DecorationsParamManager{
     }
 
     public updateChunkManager(managerId: number, params: DecorationChunkParamsDiff): void{
-        debugger
         const decManagerParams = this.params.chunkManagers.find(managerParams => managerParams.id === managerId)
         const chunkManager = this.chunkManagers.find(manager => manager.id === managerId)
         if(!decManagerParams || ! chunkManager){

@@ -4,6 +4,7 @@ import { DecorationsManager } from "../../engine/decorations-manager/decorations
 import { EngineControllerInterface, EngineUserInterface } from "../../engine/engine";
 import { DecorationVariantParams } from "../../engine/loader-types";
 import { EditorTabBody } from "../common/editor-tab-body";
+import { ErrorText } from "../common/materials/error-text";
 import { Headline } from "../common/materials/headline";
 import { LabeledButton } from "../common/materials/labeled-button";
 import { NodeSelectionPopup } from "../common/node-selection-popup";
@@ -39,7 +40,7 @@ export class DecorationsEditor extends Component{
     super(props)
 
     this.state = { 
-      selectedChunkManagerId: 1, 
+      selectedChunkManagerId: -1, 
       nodeSelectionPopup: null,
       modelEditingPopup: null,
       modelEditingVariantId: null
@@ -54,6 +55,9 @@ export class DecorationsEditor extends Component{
   }
 
   render(){
+    const params = this.props.manager.getEngine().getDecorationsManager().getParams()
+    const chunkParams = params.chunkManagers.find(chunkManager => chunkManager.id === this.state.selectedChunkManagerId)
+    const probabilityMapId = chunkParams?.probabilityMapId ?? null
 
     return (
       <EditorTabBody manager={this.props.manager} popups={this.getPopups()}>
@@ -69,6 +73,11 @@ export class DecorationsEditor extends Component{
           <>
 
             <LabeledButton labelText="Probability Map" buttonText="select" action={this.showNodeSelectionCallback} />
+            {
+              probabilityMapId === null
+              &&
+              <ErrorText text="Select probability map source." />
+            }
 
             <ChunkManagerGeneralParams 
               key={this.state.selectedChunkManagerId}

@@ -105,7 +105,7 @@ export type DecorationChunkParams = {
     chunkSize: number,
     hysteresis: number,
     rounds: number,
-    probabilityMapId: number,
+    probabilityMapId: number | null,
     density: number,
     variants: DecorationVariantParams[]
 }
