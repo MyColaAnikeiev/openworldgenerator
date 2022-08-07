@@ -10,10 +10,15 @@ export class ViewEntity extends Entity{
     private rotationSpeed = 0.002;
 
     private viewHeight = 0.0;
+
+    private altitudeHysteresisDynamic = 0.0
+    private lastTerrainHeight: number
     
     constructor(id: number, hostEngine: EngineUserInterface, engineObjects: EngineObjects, pos: PlanePosition, orientaion: Orientation){
         const height = 0.0;
         super(id, hostEngine, engineObjects, {...pos, height}, orientaion);
+
+        this.lastTerrainHeight = this.hostEngine.getTerrainManager().getHeight(this.position)
     }
 
     /**
@@ -44,12 +49,21 @@ export class ViewEntity extends Entity{
                 this.viewHeight += change; 
                 break;
             case 'down':
-                this.viewHeight -= change; 
+                this.viewHeight = Math.max(0, this.viewHeight - change) 
                 break;
         }
 
-        this.position.height = this.viewHeight + this.hostEngine.getTerrainManager().getHeight(this.position);
+        const currentTerrainHeight = this.hostEngine.getTerrainManager().getHeight(this.position)
+        // Make camera up and down movement more smooth
+        const altitudeDiff = currentTerrainHeight - this.lastTerrainHeight
+        this.lastTerrainHeight = currentTerrainHeight
+        this.altitudeHysteresisDynamic -= altitudeDiff
+        const rateOfReturn = this.altitudeHysteresisDynamic * 0.01 
+        const rateOfReturnLimit = Math.abs(rateOfReturn) > 0.05 ? 0.05*Math.sign(rateOfReturn) : rateOfReturn
+        this.altitudeHysteresisDynamic -= rateOfReturnLimit
+        const relativeAltitude = Math.max(0.4, this.viewHeight  + this.altitudeHysteresisDynamic)
 
+        this.position.height = relativeAltitude + currentTerrainHeight
     }
 
     public rotate(horizontaly: number, verticaly: number){
