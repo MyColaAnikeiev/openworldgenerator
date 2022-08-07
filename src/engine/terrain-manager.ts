@@ -105,7 +105,11 @@ export class TerrainManager{
      */
     public getHeight(pos: PlanePosition){
         const node = this.nodeTree.getNodeInstance(this.params.sourceNodeId);
-        return node.getValue(pos.x, pos.y);
+        if(node){
+            return node.getValue(pos.x, pos.y)
+        }
+
+        return 0.0
     }
 
     /**
