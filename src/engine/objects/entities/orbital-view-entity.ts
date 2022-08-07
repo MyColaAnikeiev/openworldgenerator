@@ -9,7 +9,7 @@ export class OrbitalViewEntity extends Entity{
     private movementSpeed = 0.01
     private rotationSpeed = 0.002
 
-    private distance = 0
+    private distance = 5
     private minViewHeight = 0.6
     private viewHeight: number
 
@@ -56,13 +56,15 @@ export class OrbitalViewEntity extends Entity{
 
     public getPosition(): Position{
         const pos = this.position
-        const shiftX = this.distance * Math.sin(this.orientation.horizontal)
-        const shiftY = this.distance * Math.cos(this.orientation.horizontal)
+        const distance = Math.cos(this.orientation.vertical) * this.distance
+        const shiftHeight = -Math.sin(this.orientation.vertical) * this.distance
+        const shiftX = distance * Math.sin(this.orientation.horizontal)
+        const shiftY = distance * Math.cos(this.orientation.horizontal)
         const cameraPos = {
             x: pos.x + shiftX,
             y: pos.y + shiftY
         }
-        const cameraHeight = this.terrainManager.getHeight(cameraPos) + this.minViewHeight
+        const cameraHeight = this.terrainManager.getHeight(cameraPos) + shiftHeight
 
         return {
             ...cameraPos,
