@@ -11,6 +11,7 @@
 
 .container{
   width: 100%;
+  min-height: 60px;
   max-height: 110px;
   
   .label{
@@ -23,6 +24,7 @@
 
   .scrollable-body{
     width: 100%;
+    min-height: 60px;
     max-height: 110px;
     padding: 5px;
     border: 1px solid rgb(61, 61, 61);
