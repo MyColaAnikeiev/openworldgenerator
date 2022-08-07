@@ -101,6 +101,7 @@ export type DecorationVariantParamsDiff = {
 
 export type DecorationChunkParams = {
     id: number,
+    seed: number,
     displayed: boolean,
     chunkSize: number,
     hysteresis: number,

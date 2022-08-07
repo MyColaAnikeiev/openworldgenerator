@@ -113,9 +113,11 @@ export class DecorationsManager implements DecorationsParamManager{
     public addChunkManager(): void {
         const idList = this.params.chunkManagers.map(mng => mng.id)
         const newId = Math.max(0,...idList) + 1
+        const seed =  parseInt(newId + (Math.floor(Math.random() * 1000) + 1000).toString())
 
         this.params.chunkManagers.push({
             id: newId,
+            seed,
             displayed: true,
             chunkSize: 10,
             hysteresis: 0.1,
@@ -410,7 +412,8 @@ export class DecorationsManager implements DecorationsParamManager{
             chunkManager.instance = new DecorationsChunkManager(
                 scene, this.lastViewPosition, params.chunkSize, 
                 params.hysteresis, params.rounds, this.hostEngine.getTerrainManager(), 
-                probabilityMap, probabilityMap$, params.density, variants
+                probabilityMap, probabilityMap$, params.density, 
+                variants, params.seed
             );
 
             chunkManager.decorationVariants = variants

@@ -34,7 +34,8 @@ export class DecorationsChunkManager extends BaseChunkManager{
         private noiseGenerator: GeneratorNode,
         private noiseGenerator$: Observable<GeneratorNode | null> | null,
         private density: number,
-        private variants: DecorationVariant[]
+        private variants: DecorationVariant[],
+        private seed: number
     ){
         super(scene, viewPosition, chunkSize, hysteresis, rounds);
 
@@ -96,8 +97,9 @@ export class DecorationsChunkManager extends BaseChunkManager{
         // will be put in same array and after transformation (local to chunk) will be merged together.
         // So if for ex. source model had three meshes, then only three draw calls by openGL is needed to
         // draw single chunk. 
-        const variantsFragmentsBatches = this.variants.map(variant => variant.modelFragments.map(() => []));
-        const randGenerator = alea(task.chunkArea.i.toString() +","+ task.chunkArea.j.toString());
+        const variantsFragmentsBatches = this.variants.map(variant => variant.modelFragments.map (() => []));
+        const seedStr = task.chunkArea.i.toString() +","+ task.chunkArea.j.toString() +'_'+ this.seed
+        const randGenerator = alea(seedStr);
         const chunkShiftX = task.chunkArea.i * this.chunkSize;
         const chunkShiftY = task.chunkArea.j * this.chunkSize;
 
