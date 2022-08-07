@@ -1,6 +1,7 @@
 import { Observable, Subscription } from "rxjs";
 import { BufferAttribute, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Scene } from "three";
 import { GeneratorNode } from "../../generator/nodes/generator-node";
+import { IdentityNode } from "../../generator/nodes/identity-node";
 import { PlanePosition } from "../types";
 import { BaseChunkManager } from "./base-chunk-manager";
 import { ChunkArea, ChunkGenState, ChunkInstance, ChunkReadyState } from "./types";
@@ -40,8 +41,11 @@ export class TerrainChunkManager extends BaseChunkManager{
             this.noiseGeneratorSubscription = noiseGenerator$.subscribe(gen => {
                 if(gen){
                     this.noiseGenerator = gen;
-                    this.updateChunksContent();
                 }
+                else{
+                    this.noiseGenerator = new IdentityNode()
+                }
+                this.updateChunksContent();
             })
         }
     }
