@@ -1,0 +1,64 @@
+$textColor: rgb(170, 170, 170);
+
+.source-node{
+    position: absolute;
+    width: 180px;
+    background-color: rgb(30, 27, 27);
+    border-radius: 6px 6px 0 0;
+    padding-bottom: 6px;
+    font-family: "Courier New", Courier, monospace;
+    color: $textColor;
+    border: 1px solid #3e3e3e;
+
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+
+    .drag-helper{
+        display: none;
+        width: 580px;
+        left: -200px;
+        height: 580px;
+        top: -200px;
+        position: absolute;
+        //background-color: rgba(59, 59, 59, 0.096);
+        z-index: 100;
+    }
+
+    .head{
+        position: relative;
+        height: 16px;
+        padding-top: 5px;
+        background-color: inherit;
+        border-radius: 6px 6px 0 0;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .body{
+        position: relative;
+        padding: 5px;
+    }
+
+    .preview{
+        padding: 5px 0 0 0;
+        background-color: rgb(43, 42, 42);
+
+        canvas{
+            width: 100%;
+        }
+    }
+
+
+    .hook{
+        position: absolute;
+        right: 0;
+        bottom: -25px;
+        width: 40px;
+        height: 25px;
+        background-color: white;
+        border: 1px solid black;
+        border-radius: 5px 0 5px 8px;
+    }
+}

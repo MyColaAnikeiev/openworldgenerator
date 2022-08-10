@@ -11,9 +11,34 @@ module.exports = {
     },
     module: {
         rules: [
-            {
+            {   
                 test: /.tsx?$/,
                 loader: 'ts-loader'
+            },
+            {
+                test: /.css$/,
+                use: [
+                    { 
+                        loader: "style-loader"
+                    }, 
+                    {
+                        loader: "css-loader",
+                        options: {
+                            sourceMap: true
+                        }
+                    }
+                ]
+            },
+            {
+                test: /.scss$/i,
+                use: [
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            implementation: require("sass")
+                        }
+                    }
+                ]
             }
         ]
     },

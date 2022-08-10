@@ -1,0 +1,68 @@
+.wrapper{
+    position: absolute;
+    padding: 5px;
+    border: 1px solid #484747;
+    border-radius: 5px 5px 0 0;
+    background-color: #242424;
+
+    //tmp
+    left: 800px;
+    top: 50px;
+
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+
+}
+
+.beck-drag-area{
+    position: absolute;
+    width: 600px;
+    height: 400px;
+    left: -126px;
+    top: -188px;
+}
+
+.header{
+    position: relative;
+    display: grid;
+    grid-template: "title close-btn" auto / 1fr 60px;
+
+    height: 30px;
+    border-radius: 5px 5px 0 0;
+    z-index: 2;
+    cursor:grab;
+
+    .close{
+        position: relative;
+        grid-area: close-btn;
+        background-color: rgb(224, 224, 224);
+        color: rgb(41, 41, 41);
+        border: 1px solid rgb(41, 41, 41);
+        font-size: 14px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        justify-self: center;
+        align-self: baseline;
+        cursor: pointer;
+    }
+}
+
+.body{
+    position: relative;
+
+    canvas{
+        cursor: grab;
+    }
+
+    .scale-indicator{
+        position: absolute;
+        top: 5px;
+        right: 2px;
+        padding: 2px 5px;
+        color: rgb(255, 255, 255);
+        background-color: rgba(0, 0, 0, 0.507);
+        font-size: 12px;
+    }
+}

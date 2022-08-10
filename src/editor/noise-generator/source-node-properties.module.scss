@@ -1,0 +1,19 @@
+.properties{
+    margin-top: 10px;
+}
+
+.row{
+    display: grid;
+    grid-template-columns: 55px 1fr;
+
+    input{
+        width: 100%;
+        background-color: #242222;
+        border: 1px solid #3e3e3e;
+        color: rgb(170, 170, 170);
+        margin-right: 33px;
+        font-size: 1.1em;
+        padding: 1px 0 1px 5px;
+        box-sizing: border-box;
+    }
+}
