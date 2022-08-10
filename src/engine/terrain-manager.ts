@@ -57,11 +57,13 @@ export class TerrainManager{
         if("chunkSize" in params){
             this.chunkManager.setChunkSize(Math.max(1,params.chunkSize));
             const texSize = "planeTextureSize" in params ? params.planeTextureSize : this.params.planeTextureSize;
-            this.terrainTexture.repeat.set(
-                params.chunkSize / texSize,
-                params.chunkSize / texSize
-            );  
-            this.terrainTexture.needsUpdate = true;
+            if(this.terrainTexture){
+                this.terrainTexture.repeat.set(
+                    params.chunkSize / texSize,
+                    params.chunkSize / texSize
+                );  
+                this.terrainTexture.needsUpdate = true;
+            }
         }
         if("hysteresis" in params){
             this.chunkManager.setHysteresis(Math.max(0,params.hysteresis));
@@ -86,11 +88,13 @@ export class TerrainManager{
         }
         if("planeTextureSize" in  params){
             const chunkSize = "chunkSize" in params ? params.chunkSize : this.params.chunkSize;
-            this.terrainTexture.repeat.set(
-                chunkSize / params.planeTextureSize,
-                chunkSize / params.planeTextureSize
-            );  
-            this.terrainTexture.needsUpdate = true;
+            if(this.terrainTexture){
+                this.terrainTexture.repeat.set(
+                    chunkSize / params.planeTextureSize,
+                    chunkSize / params.planeTextureSize
+                );  
+                this.terrainTexture.needsUpdate = true;
+            }
         }
 
         this.params = {...this.params, ...params};
