@@ -17,38 +17,37 @@ export interface EngineSceneParams{
     sunLightColor: number | string
 }
 
-
 /**
  * Objects
  */
 export type EntityType = "viewer" | "orbital-viewer"
 
-export type EntityDescription = {
-    id: number,
-    type: EntityType,
-    position: PlanePosition,
+export interface EntityDescription {
+    id: number
+    type: EntityType
+    position: PlanePosition
     orientation: Orientation
 }
 
 
 export type ControllerType = 'viewer';
 
-export type ControllerDescription = {
-    type: ControllerType,
+export interface ControllerDescription {
+    type: ControllerType
     targetId: number
 }
 
 
 export type CameraType = 'first-person';
 
-export type CameraDescription = {
-    type: CameraType,
+export interface CameraDescription {
+    type: CameraType
     targetId: number
 }
 
-export type EngineOjectsDescription = {
-    entities: EntityDescription[],
-    camera: CameraDescription,
+export interface EngineOjectsDescription {
+    entities: EntityDescription[]
+    camera: CameraDescription
     controllers: ControllerDescription[]
 }
 
@@ -64,20 +63,16 @@ export interface TerrainManagerParams{
     planeTextureSize: number
 }
 
-export type TerreinManagerDescription = {
-    params: TerrainManagerParams
-}
-
 // Decorations
-export type DecorationVariantParams = {
-    id: number,
-    probability: number,
-    modelSrc: string,
-    gltfNodeName: string | null,
-    scale: number,
-    translate: {x: number, y: number, z: number},
-    envMapIntensity?: number,
-    alphaTest?: number,
+export interface DecorationVariantParams {
+    id: number
+    probability: number
+    modelSrc: string
+    gltfNodeName: string | null
+    scale: number
+    translate: {x: number, y: number, z: number}
+    envMapIntensity?: number
+    alphaTest?: number
     color?: number | string
 }
 
@@ -98,41 +93,38 @@ export type DecorationVariantParamsDiff = {
     color?: number | string | null
 }
 
-export type DecorationChunkParams = {
-    id: number,
-    seed: number,
-    displayed: boolean,
-    chunkSize: number,
-    hysteresis: number,
-    rounds: number,
-    probabilityMapId: number | null,
-    density: number,
+export interface DecorationChunkParams {
+    id: number
+    seed: number
+    displayed: boolean
+    chunkSize: number
+    hysteresis: number
+    rounds: number
+    probabilityMapId: number | null
+    density: number
     variants: DecorationVariantParams[]
 }
 
-/**
- * Used to specify changes to `DecorationVariantParams` (hence 'Diff' ending).
- */
+type DecorationChunkUpdatebleParams = 
+  'displayed' | 
+  'chunkSize' | 
+  'hysteresis' | 
+  'rounds' | 
+  'probabilityMapId' |
+  'density'
+
 export type DecorationChunkParamsDiff = {
-    displayed?: boolean,
-    chunkSize?: number,
-    hysteresis?: number,
-    rounds?: number,
-    probabilityMapId?: number,
-    density?: number
+    [K in DecorationChunkUpdatebleParams]+?: DecorationChunkParams[K]
 }
 
-export type DecorationManagerParams = {
-    chunkManagers: DecorationChunkParams[];
+export interface DecorationManagerParams {
+    chunkManagers: DecorationChunkParams[]
 }
 
-
-// General
-
-export type EnginePreset = {
-    nodeTreeSnapshot: NodeTreeSnapshot,
-    scene: EngineSceneParams,
-    terrainManager: TerrainManagerParams,
-    decorationManager: DecorationManagerParams,
-    objectDescriptions: EngineOjectsDescription,
+export interface EnginePreset {
+    nodeTreeSnapshot: NodeTreeSnapshot
+    scene: EngineSceneParams
+    terrainManager: TerrainManagerParams
+    decorationManager: DecorationManagerParams
+    objectDescriptions: EngineOjectsDescription
 }
