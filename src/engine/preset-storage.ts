@@ -100,14 +100,14 @@ export class PresetStorage implements EngineLoader,PresetStorageManager{
         if(this.currentPreset.scene){
             return this.currentPreset.scene;
         }
-        return {};
+        return defaultPreset.scene
     }
 
     public getTerrainManagerParams(): TerrainManagerParams{
         if(this.currentPreset.terrainManager){
             return this.currentPreset.terrainManager;
         }
-        return {};
+        return defaultPreset.terrainManager
     }
 
     public getDecorationsManagerParams(): DecorationManagerParams {

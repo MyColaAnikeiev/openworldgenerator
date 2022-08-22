@@ -2,20 +2,19 @@ import { NodeTreeSnapshot } from "../generator/types"
 import { Orientation, PlanePosition } from "./types"
 
 
-export type EngineSceneParams = {
-    fogType?: 'none' | 'linear' | 'exponential',
-    fogColor?: number | string,
-    linearFogNear?: number,
-    linearFogFar?: number,
-    exponentialFoxDensity?: number,
+export interface EngineSceneParams{
+    fogType: 'none' | 'linear' | 'exponential'
+    fogColor: number | string
+    linearFogNear: number
+    linearFogFar: number
+    exponentialFoxDensity: number
+    sceneClearColor: number | string
+    sceneBackgroundColor: number | string
 
-    sceneClearColor?: number | string,
-    sceneBackgroundColor?: number | string,
-
-    ambientLightIntensity?: number,
-    ambientLightColor?: number | string,
-    sunLightIntensity?: number,
-    sunLightColor?: number | string
+    ambientLightIntensity: number
+    ambientLightColor: number | string
+    sunLightIntensity: number
+    sunLightColor: number | string
 }
 
 
@@ -55,14 +54,14 @@ export type EngineOjectsDescription = {
 
 
 // Terrain
-export type TerrainManagerParams = {
-    chunkSize?: number,
-    hysteresis?: number,
-    rounds?: number,
-    terrainResolution?: number,
-    sourceNodeId?: number,
-    planeTextureMapSrc?: string,
-    planeTextureSize?: number
+export interface TerrainManagerParams{
+    chunkSize: number
+    hysteresis: number
+    rounds: number
+    terrainResolution: number
+    sourceNodeId: number
+    planeTextureMapSrc: string
+    planeTextureSize: number
 }
 
 export type TerreinManagerDescription = {

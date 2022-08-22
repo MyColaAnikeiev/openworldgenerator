@@ -84,7 +84,7 @@ export class EngineScene{
     /**
      * Look at which properties was changed and updates scene accordingly.
      */
-    public setParams(params: EngineSceneParams){
+    public setParams(params: Partial<EngineSceneParams>){
         if(params.fogType !== undefined && params.fogType !== this.params.fogType){
             const tmpParams = {...this.params, ...params}
 

@@ -52,7 +52,7 @@ export class TerrainManager{
      * Takes any number of supported params (see `TerrainManagerParams`) and
      * updates them on a fly.
      */
-    public setParams(params: TerrainManagerParams): void{
+    public setParams(params: Partial<TerrainManagerParams>): void{
         /* See what changed and update it. */
         if("chunkSize" in params){
             this.chunkManager.setChunkSize(Math.max(1,params.chunkSize));
