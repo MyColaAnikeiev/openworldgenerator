@@ -2,7 +2,7 @@ import { MeshBasicMaterial, MeshLambertMaterial, RepeatWrapping, Scene, Texture,
 import { NodeTreeUser } from "../generator/node-tree-generator";
 import { TerrainChunkManager } from "./chunk-manager/terrain-chunck-manager";
 import { EngineLoader } from "./engine-loader";
-import { TerrainManagerParams } from "./loader-types";
+import { TerrainManagerParams } from "./preset-types";
 import { PlanePosition } from "./types";
 
 const defaultParams: TerrainManagerParams = {

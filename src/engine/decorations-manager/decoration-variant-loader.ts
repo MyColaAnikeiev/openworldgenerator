@@ -1,7 +1,7 @@
 import { Material, Mesh, MeshStandardMaterial, Object3D } from "three";
 import { DecorationModelFragment, DecorationVariant } from "../chunk-manager/types";
 import { EngineUserInterface } from "../engine";
-import { DecorationVariantParams } from "../loader-types";
+import { DecorationVariantParams } from "../preset-types";
 import { DecorationVariantsLoaderI } from "./decoration-variants-loader-interface";
 import { ModelLoaderI } from "../../common/tools/model-loader/model-loader-interface";
 

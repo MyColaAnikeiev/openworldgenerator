@@ -2,7 +2,7 @@ import { NodeTreeSnapshot } from "../generator/types";
 import { defaultPreset } from "./default-preset";
 import { EngineUserInterface } from "./engine";
 import { EngineLoader } from "./engine-loader";
-import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
+import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./preset-types";
 
 
 export interface PresetStorageManager{

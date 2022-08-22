@@ -7,7 +7,7 @@ import { EngineLoader } from "../engine-loader";
 import { Entity } from "./entities/entity";
 import { OrbitalViewEntity } from "./entities/orbital-view-entity";
 import { ViewEntity } from "./entities/view-entity";
-import { EngineOjectsDescription } from "../loader-types";
+import { EngineOjectsDescription } from "../preset-types";
 import { PlanePosition } from "../types";
 
 

@@ -1,5 +1,5 @@
 import { NodeConnection, NodeSchema, NodeTreeSnapshot } from "../generator/types";
-import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
+import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./preset-types";
 
 export const nodeSchemas: NodeSchema[] = [
     {

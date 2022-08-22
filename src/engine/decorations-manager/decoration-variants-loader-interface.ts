@@ -1,5 +1,5 @@
 import { DecorationVariant } from "../chunk-manager/types";
-import { DecorationVariantParams } from "../loader-types";
+import { DecorationVariantParams } from "../preset-types";
 
 /**
  * INTERFACE for tools for loading and preprocessing models into 

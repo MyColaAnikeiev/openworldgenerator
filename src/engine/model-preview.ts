@@ -6,7 +6,7 @@ import { DecorationVariantsLoader } from "./decorations-manager/decoration-varia
 import { DecorationVariantsLoaderI } from "./decorations-manager/decoration-variants-loader-interface";
 import { Engine } from "./engine";
 import { EngineLoader } from "./engine-loader";
-import { DecorationManagerParams, DecorationVariantParams, DecorationVariantParamsDiff, EngineOjectsDescription, EngineSceneParams, TerrainManagerParams } from "./loader-types";
+import { DecorationManagerParams, DecorationVariantParams, DecorationVariantParamsDiff, EngineOjectsDescription, EngineSceneParams, TerrainManagerParams } from "./preset-types";
 import { PlanePosition } from "./types";
 
 const editPosition: PlanePosition = { x: 30, y: 30}

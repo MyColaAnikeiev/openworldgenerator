@@ -2,7 +2,7 @@ import { AmbientLight, DirectionalLight, Fog, FogBase, FogExp2, Object3D, PMREMG
 import { Camera } from "./objects/cameras/camera";
 import { Engine } from "./engine";
 import { EngineLoader } from "./engine-loader";
-import { EngineSceneParams } from "./loader-types";
+import { EngineSceneParams } from "./preset-types";
 
 const defaultParams: EngineSceneParams = {
     fogType: 'linear',

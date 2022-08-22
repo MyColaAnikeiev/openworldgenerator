@@ -1,6 +1,6 @@
 import { Component } from "react"
 import { Engine } from "../../engine/engine"
-import { DecorationVariantParams } from "../../engine/loader-types"
+import { DecorationVariantParams } from "../../engine/preset-types"
 import { ModelPreviewer } from "../../engine/model-preview"
 import { MColorPicker } from "../common/materials/color-picker"
 import { LabeledNumberInput } from "../common/materials/labeled-number-input"
