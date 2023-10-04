@@ -2,7 +2,7 @@ import { NodeTreeSnapshot } from "../generator/types";
 import { defaultPreset } from "./default-preset";
 import { EngineUserInterface } from "./engine";
 import { EngineLoader } from "./engine-loader";
-import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
+import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./preset-types";
 
 
 export interface PresetStorageManager{
@@ -100,14 +100,14 @@ export class PresetStorage implements EngineLoader,PresetStorageManager{
         if(this.currentPreset.scene){
             return this.currentPreset.scene;
         }
-        return {};
+        return defaultPreset.scene
     }
 
     public getTerrainManagerParams(): TerrainManagerParams{
         if(this.currentPreset.terrainManager){
             return this.currentPreset.terrainManager;
         }
-        return {};
+        return defaultPreset.terrainManager
     }
 
     public getDecorationsManagerParams(): DecorationManagerParams {

@@ -1,4 +1,4 @@
-import { DecorationManagerParams, EngineOjectsDescription, EngineSceneParams, TerrainManagerParams } from "./loader-types";
+import { DecorationManagerParams, EngineOjectsDescription, EngineSceneParams, TerrainManagerParams } from "./preset-types";
 
 
 

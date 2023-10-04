@@ -1,5 +1,5 @@
 import { NodeConnection, NodeSchema, NodeTreeSnapshot } from "../generator/types";
-import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./loader-types";
+import { DecorationManagerParams, EngineOjectsDescription, EnginePreset, EngineSceneParams, TerrainManagerParams } from "./preset-types";
 
 export const nodeSchemas: NodeSchema[] = [
     {
@@ -96,14 +96,28 @@ const nodeTreeSnapshot: NodeTreeSnapshot = {
     connections: nodeConnections
 }
 
-const scene: EngineSceneParams = {};
+const scene: EngineSceneParams = {
+    fogType: 'none',
+    fogColor: 0xffffff,
+    linearFogNear: 100,
+    linearFogFar: 1000,
+    exponentialFoxDensity: 0.002,
+    sceneClearColor: 0xffffff,
+    sceneBackgroundColor: 0xffffff,
+    ambientLightIntensity: 0.15,
+    ambientLightColor: 0xffffff,
+    sunLightIntensity: 0.85,
+    sunLightColor: 0xffffff
+};
 
 const terrainManager: TerrainManagerParams = {
     chunkSize: 100,
     hysteresis: 0.1,
     rounds: 15,
     terrainResolution: 100,
-    sourceNodeId: 2
+    sourceNodeId: 2,
+    planeTextureMapSrc: '',
+    planeTextureSize: 1.0
 };
 
 const objectDescriptions: EngineOjectsDescription = {

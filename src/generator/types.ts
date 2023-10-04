@@ -51,14 +51,14 @@ export interface NodeSchema{
 
 export type ConnectionTargetType = "default" | "scale-filter.control";
 
-export type NodeConnection = {
+export interface NodeConnection {
     idTo: number,
     idFrom: number,
     targetType: ConnectionTargetType,
     targetEntryNumber?: number
 }
 
-export type NodeTreeSnapshot = {
-    nodes: NodeSchema[],
+export interface NodeTreeSnapshot{
+    nodes: NodeSchema[]
     connections: NodeConnection[]
 }

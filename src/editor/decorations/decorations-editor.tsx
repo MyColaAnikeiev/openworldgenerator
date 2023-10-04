@@ -2,7 +2,7 @@ import { Component, ReactElement } from "react";
 import { EngineManager } from "../../engine-manager";
 import { DecorationsManager } from "../../engine/decorations-manager/decorations-manager";
 import { EngineControllerInterface, EngineUserInterface } from "../../engine/engine";
-import { DecorationVariantParams } from "../../engine/loader-types";
+import { DecorationVariantParams } from "../../engine/preset-types";
 import { EditorTabBody } from "../common/editor-tab-body";
 import { ErrorText } from "../common/materials/error-text";
 import { Headline } from "../common/materials/headline";

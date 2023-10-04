@@ -1,6 +1,6 @@
 import { Component, ReactNode } from "react"
 import { DecorationsParamManager } from "../../engine/decorations-manager/decorations-manager"
-import { DecorationChunkParams } from "../../engine/loader-types"
+import { DecorationChunkParams } from "../../engine/preset-types"
 import { NumberInput } from "../common/materials/number-input"
 
 import styles from './decoration-variant.module.scss'

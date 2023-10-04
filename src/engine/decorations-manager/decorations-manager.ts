@@ -1,7 +1,7 @@
 import { NodeTreeUser } from "../../generator/node-tree-generator";
 import { DecorationsChunkManager } from "../chunk-manager/decorations-chunk-manager";
 import { EngineLoader } from "../engine-loader";
-import { DecorationChunkParams, DecorationChunkParamsDiff, DecorationManagerParams, DecorationVariantParamsDiff } from "../loader-types";
+import { DecorationChunkParams, DecorationChunkParamsDiff, DecorationManagerParams, DecorationVariantParamsDiff } from "../preset-types";
 import { PlanePosition } from "../types";
 import { EngineUserInterface } from "../engine";
 import { DecorationVariantsLoaderI } from "./decoration-variants-loader-interface";
