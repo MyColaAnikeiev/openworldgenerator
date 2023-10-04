@@ -36,22 +36,22 @@ export class Editor extends Component{
         const topBarSwitchers: TopBarSwitchEntry[] = [
             {
                 text: "scene",
-                iconSrc:"public/assets/fontawesome/solid/image.svg",
+                iconSrc:"assets/fontawesome/solid/image.svg",
                 action: () => this.setState({editorType: "scene-editor"})
             },
             {
                 text: "noise generator",
-                iconSrc:"public/assets/fontawesome/solid/diagram-project.svg",
+                iconSrc:"assets/fontawesome/solid/diagram-project.svg",
                 action: () => this.setState({editorType: "node-editor"})
             },
             {
                 text: "terrain",
-                iconSrc:"public/assets/fontawesome/solid/earth-africa.svg",
+                iconSrc:"assets/fontawesome/solid/earth-africa.svg",
                 action: () => this.setState({editorType: "terrain-editor"})
             },
             {
                 text: "decorations",
-                iconSrc:"public/assets/fontawesome/solid/tree.svg",
+                iconSrc:"assets/fontawesome/solid/tree.svg",
                 action: () => this.setState({editorType: "decorations-editor"})
             } 
         ];
