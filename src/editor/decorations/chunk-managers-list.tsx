@@ -72,8 +72,8 @@ export class ChunkManagersList extends Component{
           <div className={styles["visiability-indicator"]} onClick={toggleDisplayed}>
             {
               params.displayed === true
-              ? <img src="public/assets/fontawesome/solid/circle-check.svg" />
-              : <img src="public/assets/fontawesome/solid/circle.svg" />
+              ? <img src="assets/fontawesome/solid/circle-check.svg" />
+              : <img src="assets/fontawesome/solid/circle.svg" />
             }
           </div>
 
@@ -81,7 +81,7 @@ export class ChunkManagersList extends Component{
           </div>
 
           <div className={styles["remove-btn"]} onClick={deleteChunkManager}>
-            <img src="public/assets/fontawesome/solid/trash-can.svg"></img>
+            <img src="assets/fontawesome/solid/trash-can.svg"></img>
           </div>
 
         </div>
